@@ -168,8 +168,21 @@ def clean_text(text):
 
 def process_data(df):
     df = df.copy()
+    
+    # --- FIX APPLIED HERE ---
+    # Convert Views, Likes, Comments to numeric.
+    # Any string data (like "1,200" or "N/A") will become NaN instead of causing a TypeError.
+    numeric_cols = ['Views', 'Likes', 'Comments']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    # ------------------------
+
     df.drop_duplicates(subset=['Keyword'], keep='first', inplace=True)
-    df.dropna(subset=['Transcript', 'Views', 'Likes', 'Comments'], inplace=True)
+    
+    # Now this dropna will safely drop rows where numeric conversion failed
+    df.dropna(subset=['Transcript'] + numeric_cols, inplace=True)
+    
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
     df.dropna(subset=['Date Released'], inplace=True)
     df = df[(df['Date Released'].dt.year >= 2010) & (df['Date Released'].dt.year <= 2025)]
@@ -178,7 +191,10 @@ def process_data(df):
     labels = ['2010-2014', '2015-2019', '2020-2025']
     df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
     df.dropna(subset=['period'], inplace=True)
+    
+    # Safe to add now since we know they are numbers
     df['engagement_score'] = df['Views'] + df['Likes'] + df['Comments']
+    
     df['clean_transcript'] = df['Transcript'].apply(clean_text)
     df = df[df['clean_transcript'].str.strip() != '']
     return df
