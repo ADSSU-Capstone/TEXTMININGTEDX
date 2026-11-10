@@ -483,7 +483,7 @@ def main():
             'Videos': '{:,}', 'Views': '{:,}', 'Likes': '{:,}',
             'Comments': '{:,}', 'Avg_Engagement': '{:,.0f}',
             'Total_Engagement': '{:,.0f}'
-        }).hide_index(), use_container_width=True)
+        }), use_container_width=True, hide_index=True)
 
         st.subheader("Total Engagement Score by Period")
         st.bar_chart(period_agg.set_index('period')['Total_Engagement'], use_container_width=True)
@@ -506,7 +506,7 @@ def main():
                 theme_agg = p_df.groupby('Theme')['engagement_score'].sum().reset_index()
                 theme_agg = theme_agg.sort_values('engagement_score', ascending=False).head(6)
                 
-                st.dataframe(theme_agg.style.format({'engagement_score': '{:,.0f}'}).hide_index(), use_container_width=True)
+                st.dataframe(theme_agg.style.format({'engagement_score': '{:,.0f}'}), use_container_width=True, hide_index=True)
                 st.bar_chart(theme_agg.set_index('Theme')['engagement_score'], use_container_width=True)
             else:
                 st.info("Theme column (Column H) not found in the dataset.")
@@ -523,16 +523,14 @@ def main():
                         with st.expander(f"Theme: {theme} (Top 3 Titles)"):
                             display_df = theme_titles[['Keyword', 'engagement_score']].copy()
                             display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
-                            # HIDING THE INDEX HERE
-                            st.dataframe(display_df.style.format({'Engagement Score': '{:,.0f}'}).hide_index(), use_container_width=True)
+                            st.dataframe(display_df.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True, hide_index=True)
 
             # 3. MOST ENGAGING KEYWORDS OVERALL
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             top_titles = p_df.sort_values('engagement_score', ascending=False).head(5)
             display_top = top_titles[['Keyword', 'engagement_score']].copy()
             display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
-            # HIDING THE INDEX HERE
-            st.dataframe(display_top.style.format({'Engagement Score': '{:,.0f}'}).hide_index(), use_container_width=True)
+            st.dataframe(display_top.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True, hide_index=True)
             st.markdown("---")
 
     with tab3:
@@ -547,12 +545,11 @@ def main():
                 Avg_Engagement=('engagement_score', 'mean')
             ).reset_index().sort_values('Total_Engagement', ascending=False)
 
-            # HIDING THE INDEX HERE
             st.dataframe(theme_agg.style.format({
                 'Videos': '{:,}', 
                 'Total_Engagement': '{:,.0f}',
                 'Avg_Engagement': '{:,.0f}'
-            }).hide_index(), use_container_width=True)
+            }), use_container_width=True, hide_index=True)
 
             st.subheader("Average Engagement Score by Theme")
             st.bar_chart(theme_agg.set_index('Theme')['Avg_Engagement'], use_container_width=True)
@@ -584,8 +581,7 @@ def main():
             aggfunc='sum', observed=True
         )
         st.subheader("Aggregate Metrics Over Time")
-        # HIDING THE INDEX HERE
-        st.dataframe(pivot_engagement.style.format('{:,.0f}').hide_index(), use_container_width=True)
+        st.dataframe(pivot_engagement.style.format('{:,.0f}'), use_container_width=True, hide_index=True)
 
         st.subheader("Growth in Engagement Score")
         if len(pivot_engagement) > 1:
@@ -600,8 +596,7 @@ def main():
                     growth_list.append(f"{val:,.1f}%")
             
             growth_df = pd.DataFrame({'Period': growth.index, 'Growth': growth_list})
-            # HIDING THE INDEX HERE
-            st.dataframe(growth_df.style.hide_index(), use_container_width=True)
+            st.dataframe(growth_df, use_container_width=True, hide_index=True)
             
             # For the chart, only plot the actual numeric values (drop the baseline)
             chart_growth = growth.dropna()
@@ -614,8 +609,7 @@ def main():
         if 'Theme' in df.columns:
             theme_share = df.groupby(['period', 'Theme'], observed=True).size().unstack(fill_value=0)
             theme_share_pct = theme_share.div(theme_share.sum(axis=1), axis=0) * 100
-            # HIDING THE INDEX HERE
-            st.dataframe(theme_share_pct.style.format('{:.1f}%').hide_index(), use_container_width=True)
+            st.dataframe(theme_share_pct.style.format('{:.1f}%'), use_container_width=True, hide_index=True)
             st.bar_chart(theme_share_pct, use_container_width=True)
         else:
             st.info("Theme column not found.")
