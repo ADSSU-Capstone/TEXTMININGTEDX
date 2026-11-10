@@ -304,7 +304,6 @@ div[data-testid="stAlert"]{
 
 @st.cache_data
 def load_example_data():
-    # Using short placeholder text for transcripts to prevent Syntax Errors
     df = pd.DataFrame({
         'Speaker': ['Jessica Dere', 'Nadine Burke Harris', 'Guy Winch', 'John Rigg', 'Dr. Jeffrey Lieberman', 'Judson Brewer'],
         'Keyword': ['Challenges and rewards of a culturally informed approach to mental health', 'How childhood trauma affects health across a lifetime', 'How to practice emotional first aid', 'The effect of trauma on the brain and how it affects behaviors', 'Imagine there was no stigma to mental illness', 'A simple way to break a bad habit'],
@@ -312,7 +311,7 @@ def load_example_data():
         'Views': [465557, 8300874, 5467141, 2760468, 609769, 16882137],
         'Likes': [3000, 197000, 201000, 33000, 9000, 328000],
         'Comments': [45, 9237, 3391, 2319, 643, 5667],
-        'Topic': ['Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness'],
+        'Theme': ['Mental Health', 'Mental Health', 'Mental Health', 'Mental Health', 'Mental Health', 'Mental Health'],
         'Transcript': [
             "thank you it's truly an honor to be here I would like to start my talk today with a little exercise introducing you to a person named Pat", 
             "In the mid-90s the CDC and Kaiser Permanente discovered an exposure that dramatically increased the risk", 
@@ -350,13 +349,24 @@ def clean_text(text):
 def process_data(df):
     df = df.copy()
 
+    # 1. DYNAMICALLY MAP COLUMN H TO "Theme"
+    if len(df.columns) >= 8 and 'Theme' not in df.columns:
+        df.rename(columns={df.columns[7]: 'Theme'}, inplace=True)
+
     numeric_cols = ['Views', 'Likes', 'Comments']
     for col in numeric_cols:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    df.drop_duplicates(subset=['Keyword'], keep='first', inplace=True)
-    df.dropna(subset=['Transcript'] + numeric_cols, inplace=True)
+    # 2. RELAXED FILTERING TO KEEP ALL 300 ROWS
+    # We no longer drop duplicates or rows with empty transcripts. 
+    # We fill missing values with 0 or "Unknown" to preserve the dataset size.
+    df['Transcript'] = df['Transcript'].fillna("Empty Transcript")
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = df[col].fillna(0)
+    if 'Theme' in df.columns:
+        df['Theme'] = df['Theme'].fillna("Uncategorized")
 
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
     df.dropna(subset=['Date Released'], inplace=True)
@@ -371,7 +381,6 @@ def process_data(df):
 
     df['engagement_score'] = df['Views'] + df['Likes'] + df['Comments']
     df['clean_transcript'] = df['Transcript'].apply(clean_text)
-    df = df[df['clean_transcript'].str.strip() != '']
     return df
 
 
@@ -413,15 +422,7 @@ def render_filters(df):
         if not selected_periods:
             selected_periods = all_periods
 
-        max_eng = int(df['engagement_score'].max())
-        step = max(1, max_eng // 100)
-        min_eng = st.slider(
-            "Minimum engagement score", 0, max_eng, 0, step=step,
-            help="Hide low-performing talks from all charts and tables."
-        )
-
     out = df[df['period'].isin(selected_periods)]
-    out = out[out['engagement_score'] >= min_eng]
 
     if out.empty:
         st.warning("No talks match the current filters. Loosen them in the sidebar.")
@@ -441,16 +442,14 @@ def main():
 
     raw_df = render_sidebar()
 
-    required_cols = ['Keyword', 'Speaker', 'Date Released', 'Views', 'Likes',
-                     'Comments', 'Transcript']
+    required_cols = ['Keyword', 'Speaker', 'Date Released', 'Views', 'Likes', 'Comments', 'Transcript']
     if not all(c in raw_df.columns for c in required_cols):
         st.error(f"Dataset is missing one or more required columns: {required_cols}")
         st.stop()
 
     df = process_data(raw_df)
     if df.empty:
-        st.error("No data available after filtering. Check the 2015-2025 scope, "
-                 "English transcripts, and valid engagement metrics.")
+        st.error("No data available after filtering.")
         st.stop()
 
     df = render_filters(df)
@@ -491,43 +490,52 @@ def main():
         }), use_container_width=True)
 
         st.subheader("Total Engagement Score by Period")
-        st.bar_chart(period_agg.set_index('period')['Total_Engagement'],
-                     use_container_width=True)
+        st.bar_chart(period_agg.set_index('period')['Total_Engagement'], use_container_width=True)
 
         st.subheader("Average Engagement Score per Video")
-        st.bar_chart(period_agg.set_index('period')['Avg_Engagement'],
-                     use_container_width=True)
-
-        st.subheader("Individual Engagement Metrics")
-        st.bar_chart(period_agg.set_index('period')[['Views', 'Likes', 'Comments']],
-                     use_container_width=True)
+        st.bar_chart(period_agg.set_index('period')['Avg_Engagement'], use_container_width=True)
 
     with tab2:
-        # NEW TAB LOGIC: Extracting top engaging titles instead of text words
-        st.header("Most Engaging Keywords (Titles) by Period")
-        st.write("These are the titles from the 'Keyword' column that drove the highest engagement, separated by five-year periods.")
+        st.header("Theme & Title Engagement Analysis")
+        st.write("This section breaks down the most engaging Themes and Keywords (Titles) for each period.")
 
         for period in df['period'].unique():
-            st.subheader(f"Period: {period}")
+            st.markdown(f"### Period: {period}")
             
-            # Filter for the specific period, sort by engagement
-            p_df = df[df['period'] == period].sort_values('engagement_score', ascending=False)
-            
-            # Grab the top 6
-            top_6 = p_df.head(6)
-            
-            if not top_6.empty:
-                # Create a display dataframe with Title and Engagement
-                display_df = top_6[['Keyword', 'engagement_score']].copy()
-                display_df.columns = ['Title (Column B)', 'Total Engagement']
+            p_df = df[df['period'] == period]
+
+            # 1. TOP 6 MOST ENGAGING TOPICS (THEMES)
+            st.markdown("#### Top 6 Most Engaging Topics (Themes)")
+            if 'Theme' in p_df.columns:
+                theme_agg = p_df.groupby('Theme')['engagement_score'].sum().reset_index()
+                theme_agg = theme_agg.sort_values('engagement_score', ascending=False).head(6)
                 
-                # Render as an interactive table
-                st.dataframe(display_df.style.format({'Total Engagement': '{:,.0f}'}), use_container_width=True)
-                
-                # Render a bar chart showing the engagement of these specific titles
-                st.bar_chart(top_6.set_index('Keyword')['engagement_score'], use_container_width=True)
+                st.dataframe(theme_agg.style.format({'engagement_score': '{:,.0f}'}), use_container_width=True)
+                st.bar_chart(theme_agg.set_index('Theme')['engagement_score'], use_container_width=True)
             else:
-                st.info(f"No data available for the {period} period.")
+                st.info("Theme column (Column H) not found in the dataset.")
+
+            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME
+            st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
+            if 'Theme' in p_df.columns:
+                for theme in p_df['Theme'].unique():
+                    # Get top 3 titles for this theme
+                    theme_titles = p_df[p_df['Theme'] == theme].sort_values('engagement_score', ascending=False).head(3)
+                    
+                    # Only display if there are titles
+                    if not theme_titles.empty:
+                        with st.expander(f"Theme: {theme} (Top 3 Titles)"):
+                            display_df = theme_titles[['Keyword', 'engagement_score']].copy()
+                            display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
+                            st.dataframe(display_df.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True)
+
+            # 3. MOST ENGAGING KEYWORDS OVERALL
+            st.markdown("#### Most Engaging Keywords (Titles) Overall")
+            top_titles = p_df.sort_values('engagement_score', ascending=False).head(5)
+            display_top = top_titles[['Keyword', 'engagement_score']].copy()
+            display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
+            st.dataframe(display_top.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True)
+            st.markdown("---")
 
     with tab3:
         st.header("Topic Modeling and Engagement")
@@ -540,8 +548,7 @@ def main():
             tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1, stop_words='english')
             tfidf = tfidf_vectorizer.fit_transform(df['clean_transcript'])
 
-            nmf = NMF(n_components=num_topics, random_state=42,
-                      init='nndsvda', max_iter=500)
+            nmf = NMF(n_components=num_topics, random_state=42, init='nndsvda', max_iter=500)
             nmf_features = nmf.fit_transform(tfidf)
             feature_names = tfidf_vectorizer.get_feature_names_out()
 
@@ -571,8 +578,7 @@ def main():
             }), use_container_width=True)
 
             st.subheader("Average Engagement Score by Topic")
-            st.bar_chart(topic_agg.set_index('Topic')['Avg_Engagement'],
-                         use_container_width=True)
+            st.bar_chart(topic_agg.set_index('Topic')['Avg_Engagement'], use_container_width=True)
 
     with tab4:
         st.header("Trend Analysis Across Periods")
@@ -589,16 +595,14 @@ def main():
         if len(pivot_engagement) > 1:
             growth = pivot_engagement['engagement_score'].pct_change() * 100
             growth_df = pd.DataFrame({'Period': growth.index, 'Growth (%)': growth.values})
-            st.dataframe(growth_df.style.format({'Growth (%)': '{:,.1f}%'}),
-                         use_container_width=True)
+            st.dataframe(growth_df.style.format({'Growth (%)': '{:,.1f}%'}), use_container_width=True)
             st.bar_chart(growth_df.set_index('Period'), use_container_width=True)
         else:
             st.info("At least two periods are required to compute growth.")
 
         if 'topic_label' in df.columns:
             st.subheader("Topic Share Over Time")
-            topic_share = df.groupby(['period', 'topic_label'],
-                                     observed=True).size().unstack(fill_value=0)
+            topic_share = df.groupby(['period', 'topic_label'], observed=True).size().unstack(fill_value=0)
             topic_share_pct = topic_share.div(topic_share.sum(axis=1), axis=0) * 100
             st.dataframe(topic_share_pct.style.format('{:.1f}%'), use_container_width=True)
             st.bar_chart(topic_share_pct, use_container_width=True)
@@ -623,8 +627,7 @@ def main():
 
         st.subheader("Statistical Comparison of Topic Engagement")
         if 'topic_label' in df.columns and df['topic_label'].nunique() > 1:
-            groups = [g['engagement_score'].values
-                      for _, g in df.groupby('topic_label')]
+            groups = [g['engagement_score'].values for _, g in df.groupby('topic_label')]
             if all(len(g) > 0 for g in groups):
                 try:
                     stat, p_value = kruskal(*groups)
@@ -639,7 +642,6 @@ def main():
                 st.warning("Insufficient data for the statistical test.")
         else:
             st.info("Topic modeling is required first — widen your filters or load more data.")
-
 
 if __name__ == "__main__":
     main()
