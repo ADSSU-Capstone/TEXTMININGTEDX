@@ -304,6 +304,7 @@ div[data-testid="stAlert"]{
 
 @st.cache_data
 def load_example_data():
+    # Using short placeholder text for transcripts to prevent Syntax Errors
     df = pd.DataFrame({
         'Speaker': ['Jessica Dere', 'Nadine Burke Harris', 'Guy Winch', 'John Rigg', 'Dr. Jeffrey Lieberman', 'Judson Brewer'],
         'Keyword': ['Challenges and rewards of a culturally informed approach to mental health', 'How childhood trauma affects health across a lifetime', 'How to practice emotional first aid', 'The effect of trauma on the brain and how it affects behaviors', 'Imagine there was no stigma to mental illness', 'A simple way to break a bad habit'],
@@ -313,5 +314,332 @@ def load_example_data():
         'Comments': [45, 9237, 3391, 2319, 643, 5667],
         'Topic': ['Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness', 'Mental Health Awareness'],
         'Transcript': [
-            "thank you it's truly an honor to be here I would like to start my talk today with a little exercise introducing you to a person named Pat Pat is 31 years old and lives at home with one sibling and their parents Pat has always lived in the family home and would not consider moving out to live alone except after getting married Pat's parents always play a significant role in making decisions about all aspects of Pat's life including education work decisions Pat's friendships and romantic life this has been the case since Pat was a child Pat rarely makes decisions without consulting family members and rarely expresses disagreement with others out of fear of disapproval or loss of support Pat feels very uncomfortable when alone and tends to cling to others out of fear of being abandoned now take a moment to picture Pat are you picturing a young man a young woman are you picturing a person of a particular ethnic or cultural background maybe similar to your own or different and consider for a moment whether such information would make a difference in how you think about Pat and whether or not you think that Pat might have some kind of mental health concern now what if I added the following information specifying that Pat is Patricia Lee and that she and her family emigrated to Canada from China when she was 5 years old or the following where Pat is Patrick Smith whose maternal and paternal grandparents immigrated to Canada from the United Kingdom and whose parents grew up in the Toronto area judging from some faces that I can see this information indeed makes a difference in how you think about Pat simply adding some basic demographic information can significantly shift how we think about the very same behavior this exercise has elicited similar responses in my classroom when I have used it in teaching about personality disorders which offer a particularly striking example of the need to consider cultural factors when defining mental illness since they are themselves defined by patterns of behavior that deviate from cultural expectations I used it exercise to introduce the role of cultural factors in thinking about mental health and illness and to introduce the central idea that culture matters in my experience once introduced Culture matters to this idea people seem to intuitively know that culture makes a difference when thinking about mental health and mental illness without specifically talking about cultural differences in things like parent child relationships Independence and interdependence or assertiveness we seem to just know that it makes a difference if we're talking about Patricia or Patrick but not only does culture matter when it comes to mental health it is fundamental many people including myself argue that a culturally informed approach is really critical to effective Healthcare and that only by including cultural factors in our discussions of this field will we truly make advances recently a group of medical and social scientists writing in one of the world's most prestigious medical journals stated the following that the systematic neglect of culture in Health and healthc Care is the single biggest barrier to the advancement of the highest standard of Health worldwide a pretty powerful statement so the this is great I see a number of you nodding and you seem to be in agreement that reflecting on Pat illustrates for you at least at a basic level the importance of considering cultural questions when it comes to mental health but stopping here would be problematic for a number of reasons first of all I still have 15 minutes and 52 seconds left on the clock but more importantly stopping here could serve to reinforce certain cultural stereotypes contrasting the lead versus The Smiths and would not really leave you with any idea of how to actually go about considering cultural factors or worse it might leave you with an overly simplistic idea of how to do this suggesting perhaps that simply knowing a person's ethnic background or immigration history provides enough information to really understand the meaning of their behaviors and relationships so acknowledging that culture matters is a crucial initial step sort of like a first piece of a puzzle but we need to go much further so if knowing Pat's cultural Common cultural ideas background is like having a first piece of the puzzle much more needs to be learned before getting even close to a complete picture for example based on common cultural ideas you may have had the sense that the description of Pat's Behavior became somehow more acceptable when it was Patricia a young woman of Chinese Canadian background compared to patri a young man and second generation Canadian of British descent however although interdependence and social harmony are values more commonly endorsed among people of Chinese background compared to Western European background is it necessarily the case that Patricia's parents are happy with her level of dependence upon them maybe their migration to Canada was partially driven by their own traits of Independence and they are really quite concerned that their daughter has not developed greater autonomy or self-reliance maybe Patricia has never felt that she fits in among her peers and really feels incapable of attaining the level of Independence as encouraged by her parents on the other hand although Independence and autonomy are commonly endorsed values in North America maybe it's normative within Patrick's family to defer to one's parents and to view life decisions as communal endeavors Cultural assumptions these examples illustrate that we cannot simply make sweeping assumptions about people purely based on their cultural background nor can we make simple comparisons or distinctions between people simply because they're from different contexts now this might suggest to you then that cultural information is of not much use at all and that we should simply focus on the individual and their unique experiences but this would also be problematic and incomp Complete because to truly understand Patricia Lee's experience we must know that her parents level of emphasis on Independence may be relatively uncommon uh uncommon within their cultural community and on the other hand um or similarly Patrick Smith's experience of his level of dependence upon his family would likely carry different meaning if he and his family were from a cultural community that particularly emphasized family bonds so in other words in order to really develop a full understanding of mental health we must develop an understanding of individuals in context so this discussion um illustrates one of the key challenges of a culturally informed approach to mental health and in teaching this field to undergraduate students I have the privileged opportunity of working with them as they wrestle with these very types of challenges the path that I often see my students take is one of initial excitement as they engage with the idea that culture matters and often tend to appreciate the in-depth discussion of a topic that tends to be lacking or minimized in teachings about mental health this initial excitement though then turns often to some level of feeling overwhelmed as they begin to really grapple with the complexity of culture and begin to recognize the number of different factors to consider and questions to pose in helping my students to navigate these questions it has helped me to distill my own thinking about this field and how best to teach it I recognize that dealing with cultural matters can indeed be daunting and I also have the concern that feeling overwhelmed can sometimes lead to the avoidance of new ideas or experiences so with that in mind I propose two related suggestions that I believe can help people to engage with a culturally informed form Med approach to mental health rather than avoid it and these are to take a stance of informed curiosity and to ask different questions and ask questions differently so a stance of informed curiosity stands in contrast to some models of culture and mental health which suggest that one needs to be an expert in a particular cultural group in order to work with or understand the experiences of a member of that group for example many articles and book chapters talk about working with Asian clients or working with Hispanic clients although well intentioned that type of approach can inadvertently lead to the perpetuation of cultural stereotypes there's the Assumption at least at some level that members of a given group share values beliefs and experiences simply based on group membership though that can be the case it is certainly not necessarily true a clinician working from such a perspective may have easily assumed that Patricia Lee's level of dependence upon her family was encouraged or supported I also always found the more expertise-based approach problematic from a personal perspective as the daughter of a Chinese Canadian father and Anglo Canadian mother born and raised in bilingual Montreal with English as a first language there is unlikely to ever be a book chapter devoted to working with people of my particular culture cultural A Stance of Informed Curiosity makeup I think my own lived experience as a person of mixed cultural heritage informs my thinking about culture and how it plays a role in mental health and my experience also plays a role in my emphasis on a stance of informed curiosity rather than expertise I believe that such a stance promotes an attitude of humility and really encourages one to develop hypotheses and questions rather than make assumptions so one of the key ways that I work to promote a stance of informed curiosity among my students is by helping them to ask different questions and ask questions differently about mental health my own passion for the area of culture and mental health really began when I took a course an introductory course in medical anthropology in the second year of my undergraduate studies this course proved to be a key turning point in my academic path and looking back I think that one of its last effects was that it forced me to ask different questions about health and mental health questions to which I had not previously been exposed in my psychology courses working with a different discipline with its own set of theories and Frameworks also instilled in me the value of asking questions differently in many ways that course forced me to re-evaluate ideas I had previously taken for granted and that type of experience is often at the heart of cultural discussions about m mental Cultural Differences health the interdisciplinary nature of my early experience also corresponds to the interdisciplinarity that often characterizes discussions of culture and mental health thinking back to that image of the complex set of puzzle pieces a cultural approach to mental health truly benefits the from the integration of different perspectives each offering their own sets and types of questions now taking a stance of inform curiosity by no means minimizes the importance of developing in-depth knowledge in cultural matters rather the emphasis is on how to engage with this knowledge with a focus really on gaining awareness of the wide range of cultural differences that exist in Human Experience so as to be equipped to pose informed questions we know from cultural psychology research that there are significant cultural differences across the Spectrum of psychological domains including in cognitive and perceptual processes regarded as basic and therefore often assumed to be Universal for example we know that there are significant cultural differences in how people perceive the world such as to what extent they focus on background information when examining a photograph versus focusing on the photograph's central figure we also know that there are significant differences in how people think about the world such as to what extent they use contextual information when grouping different objects together these types of differences suggest that some of you may be viewing the slide behind me as a single holistic image whereas others may be more focused on specific constituent Parts more directly relevant to mental health we also know that cultural context plays a profound role in what types of emotions people most value and want to feel and how and with whom they express those emotions in some cultural contexts Cultural Context feeling proud is closely associated with generally feeling good whereas in other contexts the individual Focus that Pride entails makes it less desirable and there is a large literature demonstrating important cultural differences in how people Define the very notion of the self for some the self is truly an autonomous and individual entity whereas for others their ideas about the self include close interpersonal connections so cultural differences in domains such as these should directly inform our thinking about mental health and illness if culture plays such a profound role when things are going right it must surely play a similar role when things go arai how people experience profound shifts in their emotional life is deeply influenced by their values and beliefs about emotions and when and with whom it is appropriate to share their emotions in some cultural contexts physical symptoms of major depression tend to be more strongly emphasized compared to psychological symptoms and this may be linked to cultural differences in values about emotion so at this point I have likely Rewards convinced you of a number of the challenges of taking a culturally informed approach to mental health and I have offered some suggestions about how to engage with these challenges but hopefully I have also at least planted the seed that there are rewards to be had as well not surprisingly I personally believe that the rewards at the level of research clinical care and teaching about mental health are numerous and profound and ultimately far outweigh the challenges at a research level in order to build a comprehensive understanding of mental illness we must integrate cultural factors as suggested by the quote near the start of my talk we neglect culture at our own Peril if what it means to be sad and to share this sadness with others is profoundly impacted by our values and beliefs about emotion then we will never develop a complete understanding of severe sadness or depression without a cultural approach from a clinical perspective integrating cultural factors into our assessment of a person's distress is crucial to really understand their experience and can contribute to improved treatment we know from research that treatments that integrate a person's own cultural beliefs about the causes of their distress are more effective than treatments that do not how best to integrate cultural factors into treatment is an area of ongoing investigation and debate but begins with the argument that culture makes a difference and thirdly at the level of learning about mental health for students and the general public more broadly the rewards of a culturally informed approach include greater open-mindedness increased understanding of experiences different from one's own and less stereotyping this approach also offers New Perspectives about ideas already learned about mental health these are all rewards that my own students have specifically talked about when discussing the benefits of learning about this field so my hope then for today is that you walk away with some of this increased open-mindedness curiosity and an interest in asking different questions about mental health all rooted in the central premise that culture matters thank you",
-            "In the mid-'90s, the CDC and Kaiser Permanente discovered an exposure that dramatically increased the risk for seven out of 10 of the leading causes of death in the United States. In high doses, it affects brain development, the immune system, hormonal systems, and even the way our DNA is read and transcribed. Folks who are exposed in very high doses have triple the lifetime risk of heart disease and lung cancer and a 20-year difference in life expectancy. And yet, doctors today are not trained in routine screening or treatment. Now, the exposure I'm talking about is not a pesticide or a packaging chemical. It's childhood trauma. Okay. What kind of trauma am I talking about here? I'm not talking about failing a test or losing a basketball game. I am talking about threats that are so severe or pervasive that they literally get under our skin and change our physiology: things like abuse or neglect, or growing up with a parent who struggles with mental illness or substance dependence. Now, for a long time, I viewed these things in the way I was trained to view them, either as a social problem -- refer to social services -- or as a mental health problem -- refer to mental health services. And then something happened to make me rethink my entire approach. When I finished my residency, I wanted to go someplace where I felt really needed, someplace where I could make a difference. So I came to work for California Pacific Medical Center, one of the best private hospitals in Northern California, and together, we opened a clinic in Bayview-Hunters Point, one of the poorest, most underserved neighborhoods in San Francisco. Now, prior to that point, there had been only one pediatrician in all of Bayview to serve more than 10,000 children, so we hung a shingle, and we were able to provide top-quality care regardless of ability to pay. It was so cool. We targeted the typical health disparities: access to care, immunization rates, asthma hospitalization rates, and we hit all of our numbers. We felt very proud of ourselves. But then I started noticing a disturbing trend. A lot of kids were being referred to me for ADHD, or Attention Deficit Hyperactivity Disorder, but when I actually did a thorough history and physical, what I found was that for most of my patients, I couldn't make a diagnosis of ADHD. Most of the kids I was seeing had experienced such severe trauma that it felt like something else was going on. Somehow I was missing something important. Now, before I did my residency, I did a master's degree in public health, and one of the things that they teach you in public health school is that if you're a doctor and you see 100 kids that all drink from the same well, and 98 of them develop diarrhea, you can go ahead and write that prescription for dose after dose after dose of antibiotics, or you can walk over and say, \"What the hell is in this well?\" So I began reading everything that I could get my hands on about how exposure to adversity affects the developing brains and bodies of children. And then one day, my colleague walked into my office, and he said, \"Dr. Burke, have you seen this?\" In his hand was a copy of a research study called the Adverse Childhood Experiences Study. That day changed my clinical practice and ultimately my career. The Adverse Childhood Experiences Study is something that everybody needs to know about. It was done by Dr. Vince Felitti at Kaiser and Dr. Bob Anda at the CDC, and together, they asked 17,500 adults about their history of exposure to what they called \"adverse childhood experiences,\" or ACEs. Those include physical, emotional, or sexual abuse; physical or emotional neglect; parental mental illness, substance dependence, incarceration; parental separation or divorce; or domestic violence. For every yes, you would get a point on your ACE score. And then what they did was they correlated these ACE scores against health outcomes. What they found was striking. Two things: Number one, ACEs are incredibly common. Sixty-seven percent of the population had at least one ACE, and 12.6 percent, one in eight, had four or more ACEs. The second thing that they found was that there was a dose-response relationship between ACEs and health outcomes: the higher your ACE score, the worse your health outcomes. For a person with an ACE score of four or more, their relative risk of chronic obstructive pulmonary disease was two and a half times that of someone with an ACE score of zero. For hepatitis, it was also two and a half times. For depression, it was four and a half times. For suicidality, it was 12 times. A person with an ACE score of seven or more had triple the lifetime risk of lung cancer and three and a half times the risk of ischemic heart disease, the number one killer in the United States of America. Well, of course this makes sense. Some people looked at this data and they said, \"Come on. You have a rough childhood, you're more likely to drink and smoke and do all these things that are going to ruin your health. This isn't science. This is just bad behavior.\" It turns out this is exactly where the science comes in. We now understand better than we ever have before how exposure to early adversity affects the developing brains and bodies of children. It affects areas like the nucleus accumbens, the pleasure and reward center of the brain that is implicated in substance dependence. It inhibits the prefrontal cortex, which is necessary for impulse control and executive function, a critical area for learning. And on MRI scans, we see measurable differences in the amygdala, the brain's fear response center. So there are real neurologic reasons why folks exposed to high doses of adversity are more likely to engage in high-risk behavior, and that's important to know. But it turns out that even if you don't engage in any high-risk behavior, you're still more likely to develop heart disease or cancer. The reason for this has to do with the hypothalamic–pituitary–adrenal axis, the brain's and body's stress response system that governs our fight-or-flight response. How does it work? Well, imagine you're walking in the forest and you see a bear. Immediately, your hypothalamus sends a signal to your pituitary, which sends a signal to your adrenal gland that says, \"Release stress hormones! Adrenaline! Cortisol!\" And so your heart starts to pound, Your pupils dilate, your airways open up, and you are ready to either fight that bear or run from the bear. And that is wonderful if you're in a forest and there's a bear. (Laughter) But the problem is what happens when the bear comes home every night, and this system is activated over and over and over again, and it goes from being adaptive, or life-saving, to maladaptive, or health-damaging. Children are especially sensitive to this repeated stress activation, because their brains and bodies are just developing. High doses of adversity not only affect brain structure and function, they affect the developing immune system, developing hormonal systems, and even the way our DNA is read and transcribed. So for me, this information threw my old training out the window, because when we understand the mechanism of a disease, when we know not only which pathways are disrupted, but how, then as doctors, it is our job to use this science for prevention and treatment. That's what we do. So in San Francisco, we created the Center for Youth Wellness to prevent, screen and heal the impacts of ACEs and toxic stress. We started simply with routine screening of every one of our kids at their regular physical, because I know that if my patient has an ACE score of 4, she's two and a half times as likely to develop hepatitis or COPD, she's four and half times as likely to become depressed, and she's 12 times as likely to attempt to take her own life as my patient with zero ACEs. I know that when she's in my exam room. For our patients who do screen positive, we have a multidisciplinary treatment team that works to reduce the dose of adversity and treat symptoms using best practices, including home visits, care coordination, mental health care, nutrition, holistic interventions, and yes, medication when necessary. But we also educate parents about the impacts of ACEs and toxic stress the same way you would for covering electrical outlets, or lead poisoning, and we tailor the care of our asthmatics and our diabetics in a way that recognizes that they may need more aggressive treatment, given the changes to their hormonal and immune systems. So the other thing that happens when you understand this science is that you want to shout it from the rooftops, because this isn't just an issue for kids in Bayview. I figured the minute that everybody else heard about this, it would be routine screening, multi-disciplinary treatment teams, and it would be a race to the most effective clinical treatment protocols. Yeah. That did not happen. And that was a huge learning for me. What I had thought of as simply best clinical practice I now understand to be a movement. In the words of Dr. Robert Block, the former President of the American Academy of Pediatrics, \"Adverse childhood experiences are the single greatest unaddressed public health threat facing our nation today.\" And for a lot of people, that's a terrifying prospect. The scope and scale of the problem seems so large that it feels overwhelming to think about how we might approach it. But for me, that's actually where the hopes lies, because when we have the right framework, when we recognize this to be a public health crisis, then we can begin to use the right tool kit to come up with solutions. From tobacco to lead poisoning to HIV/AIDS, the United States actually has
+            "thank you it's truly an honor to be here I would like to start my talk today with a little exercise introducing you to a person named Pat", 
+            "In the mid-90s the CDC and Kaiser Permanente discovered an exposure that dramatically increased the risk", 
+            "I grew up with my identical twin who was an incredibly loving brother", 
+            "I want to ask you to think back to some occasion in your life", 
+            "Personal Question I know we're only just meeting for the first time", 
+            "When I was first learning to meditate the instruction was to simply pay attention to my breath"
+        ]
+    })
+    return df
+
+
+def clean_text(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
+    text = re.sub(r'\[.*?\]', '', text)
+    text = re.sub(r'[^a-z\s]', '', text)
+    try:
+        stop_words = set(stopwords.words('english'))
+    except LookupError:
+        nltk.download('stopwords')
+        stop_words = set(stopwords.words('english'))
+
+    try:
+        nltk.data.find('tokenizers/punkt_tab')
+    except LookupError:
+        nltk.download('punkt_tab', quiet=True)
+
+    tokens = word_tokenize(text)
+    tokens = [word for word in tokens if word not in stop_words and len(word) > 2]
+    return ' '.join(tokens)
+
+
+def process_data(df):
+    df = df.copy()
+
+    numeric_cols = ['Views', 'Likes', 'Comments']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    df.drop_duplicates(subset=['Keyword'], keep='first', inplace=True)
+    df.dropna(subset=['Transcript'] + numeric_cols, inplace=True)
+
+    df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
+    df.dropna(subset=['Date Released'], inplace=True)
+    
+    df = df[(df['Date Released'].dt.year >= 2015) & (df['Date Released'].dt.year <= 2025)]
+    df['year'] = df['Date Released'].dt.year
+    
+    bins = [2014, 2019, 2025]
+    labels = ['2015-2019', '2020-2025']
+    df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
+    df.dropna(subset=['period'], inplace=True)
+
+    df['engagement_score'] = df['Views'] + df['Likes'] + df['Comments']
+    df['clean_transcript'] = df['Transcript'].apply(clean_text)
+    df = df[df['clean_transcript'].str.strip() != '']
+    return df
+
+
+def render_sidebar():
+    with st.sidebar:
+        st.markdown('<div class="side-head">DATA SOURCE</div>', unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("Upload Dataset", type=['csv', 'xlsx'],
+                                         label_visibility="collapsed")
+        use_example = st.checkbox("Use example dataset (if no upload)", value=False)
+
+        data = None
+        if uploaded_file is not None:
+            try:
+                if uploaded_file.name.endswith('.csv'):
+                    data = pd.read_csv(uploaded_file)
+                else:
+                    data = pd.read_excel(uploaded_file)
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
+        elif use_example:
+            data = load_example_data()
+
+        if data is None:
+            st.info("Awaiting data. Upload a file or tick the example dataset box.")
+            st.stop()
+
+        return data
+
+
+def render_filters(df):
+    with st.sidebar:
+        st.markdown('<div class="side-head">FILTERS</div>', unsafe_allow_html=True)
+
+        all_periods = list(df['period'].cat.categories)
+        selected_periods = st.multiselect(
+            "Period", all_periods, default=all_periods,
+            help="Restrict every tab to the selected five-year windows."
+        )
+        if not selected_periods:
+            selected_periods = all_periods
+
+        max_eng = int(df['engagement_score'].max())
+        step = max(1, max_eng // 100)
+        min_eng = st.slider(
+            "Minimum engagement score", 0, max_eng, 0, step=step,
+            help="Hide low-performing talks from all charts and tables."
+        )
+
+    out = df[df['period'].isin(selected_periods)]
+    out = out[out['engagement_score'] >= min_eng]
+
+    if out.empty:
+        st.warning("No talks match the current filters. Loosen them in the sidebar.")
+        st.stop()
+    return out
+
+
+def main():
+    st.markdown("""
+    <div class="hero">
+        <div class="hero-tag">TEDX DATA INTELLIGENCE</div>
+        <div class="hero-title">TEDx Talk Engagement Analysis</div>
+        <p class="hero-sub">Audience engagement, language patterns and topic clusters · 2015 – 2025</p>
+        <div class="hero-bar"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    raw_df = render_sidebar()
+
+    required_cols = ['Keyword', 'Speaker', 'Date Released', 'Views', 'Likes',
+                     'Comments', 'Transcript']
+    if not all(c in raw_df.columns for c in required_cols):
+        st.error(f"Dataset is missing one or more required columns: {required_cols}")
+        st.stop()
+
+    df = process_data(raw_df)
+    if df.empty:
+        st.error("No data available after filtering. Check the 2015-2025 scope, "
+                 "English transcripts, and valid engagement metrics.")
+        st.stop()
+
+    df = render_filters(df)
+
+    peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Talks Analysed", f"{len(df):,}")
+    k2.metric("Total Engagement", f"{int(df['engagement_score'].sum()):,}")
+    k3.metric("Avg per Talk", f"{int(df['engagement_score'].mean()):,}")
+    k4.metric("Peak Period", str(peak_period))
+    st.write("")
+
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "① Engagement by Period",
+        "② Keyword & Theme Patterns",
+        "③ Topic Clusters",
+        "④ Trends & Variations",
+        "⑤ Top Performers"
+    ])
+
+    with tab1:
+        st.header("Audience Engagement Analysis")
+        st.write("Aggregate audience engagement metrics for each five-year period.")
+
+        period_agg = df.groupby('period', observed=True).agg(
+            Videos=('Keyword', 'count'),
+            Views=('Views', 'sum'),
+            Likes=('Likes', 'sum'),
+            Comments=('Comments', 'sum'),
+            Avg_Engagement=('engagement_score', 'mean'),
+            Total_Engagement=('engagement_score', 'sum')
+        ).reset_index()
+
+        st.dataframe(period_agg.style.format({
+            'Videos': '{:,}', 'Views': '{:,}', 'Likes': '{:,}',
+            'Comments': '{:,}', 'Avg_Engagement': '{:,.0f}',
+            'Total_Engagement': '{:,.0f}'
+        }), use_container_width=True)
+
+        st.subheader("Total Engagement Score by Period")
+        st.bar_chart(period_agg.set_index('period')['Total_Engagement'],
+                     use_container_width=True)
+
+        st.subheader("Average Engagement Score per Video")
+        st.bar_chart(period_agg.set_index('period')['Avg_Engagement'],
+                     use_container_width=True)
+
+        st.subheader("Individual Engagement Metrics")
+        st.bar_chart(period_agg.set_index('period')[['Views', 'Likes', 'Comments']],
+                     use_container_width=True)
+
+    with tab2:
+        # NEW TAB LOGIC: Extracting top engaging titles instead of text words
+        st.header("Most Engaging Keywords (Titles) by Period")
+        st.write("These are the titles from the 'Keyword' column that drove the highest engagement, separated by five-year periods.")
+
+        for period in df['period'].unique():
+            st.subheader(f"Period: {period}")
+            
+            # Filter for the specific period, sort by engagement
+            p_df = df[df['period'] == period].sort_values('engagement_score', ascending=False)
+            
+            # Grab the top 6
+            top_6 = p_df.head(6)
+            
+            if not top_6.empty:
+                # Create a display dataframe with Title and Engagement
+                display_df = top_6[['Keyword', 'engagement_score']].copy()
+                display_df.columns = ['Title (Column B)', 'Total Engagement']
+                
+                # Render as an interactive table
+                st.dataframe(display_df.style.format({'Total Engagement': '{:,.0f}'}), use_container_width=True)
+                
+                # Render a bar chart showing the engagement of these specific titles
+                st.bar_chart(top_6.set_index('Keyword')['engagement_score'], use_container_width=True)
+            else:
+                st.info(f"No data available for the {period} period.")
+
+    with tab3:
+        st.header("Topic Modeling and Engagement")
+        st.write("NMF surfaces latent topics from the transcripts; engagement is then compared across clusters.")
+
+        num_topics = min(5, len(df))
+        if len(df) < 2:
+            st.warning("Insufficient data for topic modeling. At least 2 talks required.")
+        else:
+            tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1, stop_words='english')
+            tfidf = tfidf_vectorizer.fit_transform(df['clean_transcript'])
+
+            nmf = NMF(n_components=num_topics, random_state=42,
+                      init='nndsvda', max_iter=500)
+            nmf_features = nmf.fit_transform(tfidf)
+            feature_names = tfidf_vectorizer.get_feature_names_out()
+
+            topic_keywords = {}
+            for i, topic in enumerate(nmf.components_):
+                top = [feature_names[j] for j in topic.argsort()[:-11:-1]]
+                topic_keywords[f"Topic {i+1}"] = ", ".join(top)
+
+            st.subheader("Identified Topics and Keywords")
+            st.dataframe(pd.DataFrame.from_dict(
+                topic_keywords, orient='index', columns=['Top Keywords']
+            ), use_container_width=True)
+
+            df['topic_cluster'] = nmf_features.argmax(axis=1)
+            df['topic_label'] = df['topic_cluster'].apply(lambda x: f"Topic {x+1}")
+
+            topic_agg = df.groupby('topic_label').agg(
+                Videos=('Keyword', 'count'),
+                Total_Engagement=('engagement_score', 'sum'),
+                Avg_Engagement=('engagement_score', 'mean')
+            ).reset_index().rename(columns={'topic_label': 'Topic'})
+
+            st.subheader("Engagement Metrics by Topic Cluster")
+            st.dataframe(topic_agg.style.format({
+                'Videos': '{:,}', 'Total_Engagement': '{:,.0f}',
+                'Avg_Engagement': '{:,.0f}'
+            }), use_container_width=True)
+
+            st.subheader("Average Engagement Score by Topic")
+            st.bar_chart(topic_agg.set_index('Topic')['Avg_Engagement'],
+                         use_container_width=True)
+
+    with tab4:
+        st.header("Trend Analysis Across Periods")
+        st.write("Period-over-period movement in aggregate engagement and topic mix.")
+
+        pivot_engagement = df.pivot_table(
+            index='period', values=['Views', 'Likes', 'Comments', 'engagement_score'],
+            aggfunc='sum', observed=True
+        )
+        st.subheader("Aggregate Metrics Over Time")
+        st.dataframe(pivot_engagement.style.format('{:,.0f}'), use_container_width=True)
+
+        st.subheader("Growth in Engagement Score")
+        if len(pivot_engagement) > 1:
+            growth = pivot_engagement['engagement_score'].pct_change() * 100
+            growth_df = pd.DataFrame({'Period': growth.index, 'Growth (%)': growth.values})
+            st.dataframe(growth_df.style.format({'Growth (%)': '{:,.1f}%'}),
+                         use_container_width=True)
+            st.bar_chart(growth_df.set_index('Period'), use_container_width=True)
+        else:
+            st.info("At least two periods are required to compute growth.")
+
+        if 'topic_label' in df.columns:
+            st.subheader("Topic Share Over Time")
+            topic_share = df.groupby(['period', 'topic_label'],
+                                     observed=True).size().unstack(fill_value=0)
+            topic_share_pct = topic_share.div(topic_share.sum(axis=1), axis=0) * 100
+            st.dataframe(topic_share_pct.style.format('{:.1f}%'), use_container_width=True)
+            st.bar_chart(topic_share_pct, use_container_width=True)
+
+    with tab5:
+        st.header("Top Performing Content")
+        st.write("The three highest-engagement talks inside each period.")
+
+        top_videos = (df.sort_values('engagement_score', ascending=False)
+                        .groupby('period', observed=True).head(3))
+
+        for period in df['period'].unique():
+            st.subheader(f"Period: {period}")
+            period_top = top_videos[top_videos['period'] == period]
+            for _, row in period_top.iterrows():
+                with st.expander(f"{row['Keyword']} — {row['Speaker']}"):
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("Views", f"{row['Views']:,}")
+                    c2.metric("Likes", f"{row['Likes']:,}")
+                    c3.metric("Comments", f"{row['Comments']:,}")
+                    c4.metric("Engagement", f"{row['engagement_score']:,}")
+
+        st.subheader("Statistical Comparison of Topic Engagement")
+        if 'topic_label' in df.columns and df['topic_label'].nunique() > 1:
+            groups = [g['engagement_score'].values
+                      for _, g in df.groupby('topic_label')]
+            if all(len(g) > 0 for g in groups):
+                try:
+                    stat, p_value = kruskal(*groups)
+                    st.metric("Kruskal-Wallis H-test p-value", f"{p_value:.4f}")
+                    if p_value < 0.05:
+                        st.write("✅ Engagement differs significantly across topics (p < 0.05).")
+                    else:
+                        st.write("No statistically significant difference across topics (p ≥ 0.05).")
+                except ValueError:
+                    st.warning("Unable to run Kruskal-Wallis: each group needs ≥ 1 sample.")
+            else:
+                st.warning("Insufficient data for the statistical test.")
+        else:
+            st.info("Topic modeling is required first — widen your filters or load more data.")
+
+
+if __name__ == "__main__":
+    main()
