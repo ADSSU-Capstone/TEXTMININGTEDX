@@ -6,8 +6,6 @@ import string
 import os
 import io
 from collections import Counter
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import NMF
 from scipy.stats import kruskal
 import nltk
 from nltk.corpus import stopwords
@@ -358,9 +356,7 @@ def process_data(df):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    # 2. RELAXED FILTERING TO KEEP ALL 300 ROWS
-    # We no longer drop duplicates or rows with empty transcripts. 
-    # We fill missing values with 0 or "Unknown" to preserve the dataset size.
+    # 2. RELAXED FILTERING TO KEEP ALL ROWS
     df['Transcript'] = df['Transcript'].fillna("Empty Transcript")
     for col in numeric_cols:
         if col in df.columns:
@@ -465,7 +461,7 @@ def main():
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "① Engagement by Period",
         "② Keyword & Theme Patterns",
-        "③ Topic Clusters",
+        "③ Theme Clusters", 
         "④ Trends & Variations",
         "⑤ Top Performers"
     ])
@@ -538,47 +534,43 @@ def main():
             st.markdown("---")
 
     with tab3:
-        st.header("Topic Modeling and Engagement")
-        st.write("NMF surfaces latent topics from the transcripts; engagement is then compared across clusters.")
+        # REPLACED TAB 3 - NO MORE "TOPIC 1, 2, 3" NUMBERS
+        st.header("Engagement Metrics by Theme")
+        st.write("This section compares the actual Themes assigned in the dataset, showing total and average engagement.")
 
-        num_topics = min(5, len(df))
-        if len(df) < 2:
-            st.warning("Insufficient data for topic modeling. At least 2 talks required.")
-        else:
-            tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1, stop_words='english')
-            tfidf = tfidf_vectorizer.fit_transform(df['clean_transcript'])
-
-            nmf = NMF(n_components=num_topics, random_state=42, init='nndsvda', max_iter=500)
-            nmf_features = nmf.fit_transform(tfidf)
-            feature_names = tfidf_vectorizer.get_feature_names_out()
-
-            topic_keywords = {}
-            for i, topic in enumerate(nmf.components_):
-                top = [feature_names[j] for j in topic.argsort()[:-11:-1]]
-                topic_keywords[f"Topic {i+1}"] = ", ".join(top)
-
-            st.subheader("Identified Topics and Keywords")
-            st.dataframe(pd.DataFrame.from_dict(
-                topic_keywords, orient='index', columns=['Top Keywords']
-            ), use_container_width=True)
-
-            df['topic_cluster'] = nmf_features.argmax(axis=1)
-            df['topic_label'] = df['topic_cluster'].apply(lambda x: f"Topic {x+1}")
-
-            topic_agg = df.groupby('topic_label').agg(
+        if 'Theme' in df.columns:
+            theme_agg = df.groupby('Theme').agg(
                 Videos=('Keyword', 'count'),
                 Total_Engagement=('engagement_score', 'sum'),
                 Avg_Engagement=('engagement_score', 'mean')
-            ).reset_index().rename(columns={'topic_label': 'Topic'})
+            ).reset_index().sort_values('Total_Engagement', ascending=False)
 
-            st.subheader("Engagement Metrics by Topic Cluster")
-            st.dataframe(topic_agg.style.format({
-                'Videos': '{:,}', 'Total_Engagement': '{:,.0f}',
+            st.dataframe(theme_agg.style.format({
+                'Videos': '{:,}', 
+                'Total_Engagement': '{:,.0f}',
                 'Avg_Engagement': '{:,.0f}'
             }), use_container_width=True)
 
-            st.subheader("Average Engagement Score by Topic")
-            st.bar_chart(topic_agg.set_index('Topic')['Avg_Engagement'], use_container_width=True)
+            st.subheader("Average Engagement Score by Theme")
+            st.bar_chart(theme_agg.set_index('Theme')['Avg_Engagement'], use_container_width=True)
+            
+            st.subheader("Statistical Comparison of Theme Engagement")
+            if df['Theme'].nunique() > 1:
+                groups = [g['engagement_score'].values for _, g in df.groupby('Theme')]
+                if all(len(g) > 0 for g in groups):
+                    try:
+                        stat, p_value = kruskal(*groups)
+                        st.metric("Kruskal-Wallis H-test p-value", f"{p_value:.4f}")
+                        if p_value < 0.05:
+                            st.write("✅ Engagement differs significantly across themes (p < 0.05).")
+                        else:
+                            st.write("No statistically significant difference across themes (p ≥ 0.05).")
+                    except ValueError:
+                        st.warning("Unable to run Kruskal-Wallis: each group needs ≥ 1 sample.")
+                else:
+                    st.warning("Insufficient data for the statistical test.")
+        else:
+            st.info("Theme column (Column H) not found in the dataset.")
 
     with tab4:
         st.header("Trend Analysis Across Periods")
@@ -594,18 +586,33 @@ def main():
         st.subheader("Growth in Engagement Score")
         if len(pivot_engagement) > 1:
             growth = pivot_engagement['engagement_score'].pct_change() * 100
-            growth_df = pd.DataFrame({'Period': growth.index, 'Growth (%)': growth.values})
-            st.dataframe(growth_df.style.format({'Growth (%)': '{:,.1f}%'}), use_container_width=True)
-            st.bar_chart(growth_df.set_index('Period'), use_container_width=True)
+            
+            # FIXED: Replaced NaN/None with "Baseline" for the first year
+            growth_list = []
+            for i, (idx, val) in enumerate(growth.items()):
+                if pd.isna(val):
+                    growth_list.append("Baseline")
+                else:
+                    growth_list.append(f"{val:,.1f}%")
+            
+            growth_df = pd.DataFrame({'Period': growth.index, 'Growth': growth_list})
+            st.dataframe(growth_df, use_container_width=True)
+            
+            # For the chart, only plot the actual numeric values (drop the baseline)
+            chart_growth = growth.dropna()
+            if not chart_growth.empty:
+                st.bar_chart(chart_growth, use_container_width=True)
         else:
             st.info("At least two periods are required to compute growth.")
 
-        if 'topic_label' in df.columns:
-            st.subheader("Topic Share Over Time")
-            topic_share = df.groupby(['period', 'topic_label'], observed=True).size().unstack(fill_value=0)
-            topic_share_pct = topic_share.div(topic_share.sum(axis=1), axis=0) * 100
-            st.dataframe(topic_share_pct.style.format('{:.1f}%'), use_container_width=True)
-            st.bar_chart(topic_share_pct, use_container_width=True)
+        st.subheader("Theme Share Over Time")
+        if 'Theme' in df.columns:
+            theme_share = df.groupby(['period', 'Theme'], observed=True).size().unstack(fill_value=0)
+            theme_share_pct = theme_share.div(theme_share.sum(axis=1), axis=0) * 100
+            st.dataframe(theme_share_pct.style.format('{:.1f}%'), use_container_width=True)
+            st.bar_chart(theme_share_pct, use_container_width=True)
+        else:
+            st.info("Theme column not found.")
 
     with tab5:
         st.header("Top Performing Content")
@@ -624,24 +631,6 @@ def main():
                     c2.metric("Likes", f"{row['Likes']:,}")
                     c3.metric("Comments", f"{row['Comments']:,}")
                     c4.metric("Engagement", f"{row['engagement_score']:,}")
-
-        st.subheader("Statistical Comparison of Topic Engagement")
-        if 'topic_label' in df.columns and df['topic_label'].nunique() > 1:
-            groups = [g['engagement_score'].values for _, g in df.groupby('topic_label')]
-            if all(len(g) > 0 for g in groups):
-                try:
-                    stat, p_value = kruskal(*groups)
-                    st.metric("Kruskal-Wallis H-test p-value", f"{p_value:.4f}")
-                    if p_value < 0.05:
-                        st.write("✅ Engagement differs significantly across topics (p < 0.05).")
-                    else:
-                        st.write("No statistically significant difference across topics (p ≥ 0.05).")
-                except ValueError:
-                    st.warning("Unable to run Kruskal-Wallis: each group needs ≥ 1 sample.")
-            else:
-                st.warning("Insufficient data for the statistical test.")
-        else:
-            st.info("Topic modeling is required first — widen your filters or load more data.")
 
 if __name__ == "__main__":
     main()
