@@ -299,15 +299,7 @@ div[data-testid="stAlert"]{
 </style>
 """, unsafe_allow_html=True)
 
-# --- NUMBER FORMATTING HELPER ---
-def format_number(val):
-    if pd.isna(val): return ""
-    if val >= 1_000_000:
-        return f"{val/1_000_000:.1f}M"
-    elif val >= 1_000:
-        return f"{val/1_000:.1f}K"
-    else:
-        return f"{val:.0f}"
+# --- REMOVED format_number helper so we can use raw full numbers ---
 
 @st.cache_data
 def load_example_data():
@@ -356,13 +348,13 @@ def clean_text(text):
 def process_data(df):
     df = df.copy()
 
-    # 1. FIX: Explicitly map 'Topic' to 'Theme' if it exists, otherwise use Column H
+    # 1. Map 'Topic' to 'Theme' if it exists, otherwise use Column H
     if 'Topic' in df.columns:
         df.rename(columns={'Topic': 'Theme'}, inplace=True)
     elif len(df.columns) >= 8 and 'Theme' not in df.columns:
         df.rename(columns={df.columns[7]: 'Theme'}, inplace=True)
 
-    # 2. FIX: Helper function to clean "3K" or "1.5M" strings into numbers
+    # 2. Helper function to clean "3K" or "1.5M" strings into numbers
     def clean_numeric(value):
         if pd.isna(value) or value == "":
             return 0
@@ -482,9 +474,11 @@ def main():
 
     peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Talks Analysed", f"{len(df):,}")
-    k2.metric("Total Engagement", format_number(df['engagement_score'].sum()))
-    k3.metric("Avg per Talk", format_number(df['engagement_score'].mean()))
+    
+    # Changed to use f"{val:,.0f}" to format with commas and no decimals
+    k1.metric("Talks Analysed", f"{len(df):,.0f}")
+    k2.metric("Total Engagement", f"{df['engagement_score'].sum():,.0f}")
+    k3.metric("Avg per Talk", f"{df['engagement_score'].mean():,.0f}")
     k4.metric("Peak Period", str(peak_period))
     st.write("")
 
@@ -509,12 +503,15 @@ def main():
             Total_Engagement=('engagement_score', 'sum')
         ).reset_index()
 
-        # Apply format_number to the aggregated columns for display
-        styled_period_agg = period_agg.copy()
-        for col in ['Views', 'Likes', 'Comments', 'Avg_Engagement', 'Total_Engagement']:
-            styled_period_agg[col] = styled_period_agg[col].apply(format_number)
-
-        st.dataframe(styled_period_agg, use_container_width=True, hide_index=True)
+        # Using Pandas Styler to format numbers with commas directly in the dataframe
+        styled_df = period_agg.style.format({
+            'Views': '{:,.0f}',
+            'Likes': '{:,.0f}',
+            'Comments': '{:,.0f}',
+            'Avg_Engagement': '{:,.0f}',
+            'Total_Engagement': '{:,.0f}'
+        })
+        st.dataframe(styled_df, use_container_width=True, hide_index=True)
 
         st.subheader("Total Engagement Score by Period")
         st.bar_chart(period_agg.set_index('period')['Total_Engagement'], use_container_width=True)
@@ -537,9 +534,7 @@ def main():
                 theme_agg = p_df.groupby('Theme')['engagement_score'].sum().reset_index()
                 theme_agg = theme_agg.sort_values('engagement_score', ascending=False).head(6)
                 
-                styled_theme_agg = theme_agg.copy()
-                styled_theme_agg['engagement_score'] = styled_theme_agg['engagement_score'].apply(format_number)
-
+                styled_theme_agg = theme_agg.style.format({'engagement_score': '{:,.0f}'})
                 st.dataframe(styled_theme_agg, use_container_width=True, hide_index=True)
                 st.bar_chart(theme_agg.set_index('Theme')['engagement_score'], use_container_width=True)
             else:
@@ -558,9 +553,7 @@ def main():
                             display_df = theme_titles[['Keyword', 'engagement_score']].copy()
                             display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
                             
-                            styled_display = display_df.copy()
-                            styled_display['Engagement Score'] = styled_display['Engagement Score'].apply(format_number)
-                            
+                            styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
                             st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
             # 3. MOST ENGAGING KEYWORDS OVERALL
@@ -569,9 +562,7 @@ def main():
             display_top = top_titles[['Keyword', 'engagement_score']].copy()
             display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
             
-            styled_top = display_top.copy()
-            styled_top['Engagement Score'] = styled_top['Engagement Score'].apply(format_number)
-
+            styled_top = display_top.style.format({'Engagement Score': '{:,.0f}'})
             st.dataframe(styled_top, use_container_width=True, hide_index=True)
             st.markdown("---")
 
@@ -586,10 +577,10 @@ def main():
                 Avg_Engagement=('engagement_score', 'mean')
             ).reset_index().sort_values('Total_Engagement', ascending=False)
 
-            styled_theme = theme_agg.copy()
-            styled_theme['Total_Engagement'] = styled_theme['Total_Engagement'].apply(format_number)
-            styled_theme['Avg_Engagement'] = styled_theme['Avg_Engagement'].apply(format_number)
-
+            styled_theme = theme_agg.style.format({
+                'Total_Engagement': '{:,.0f}',
+                'Avg_Engagement': '{:,.0f}'
+            })
             st.dataframe(styled_theme, use_container_width=True, hide_index=True)
 
             st.subheader("Average Engagement Score by Theme")
@@ -623,17 +614,18 @@ def main():
         )
         st.subheader("Aggregate Metrics Over Time")
         
-        styled_pivot = pivot_engagement.copy()
-        for col in ['Views', 'Likes', 'Comments', 'engagement_score']:
-            styled_pivot[col] = styled_pivot[col].apply(format_number)
-
+        styled_pivot = pivot_engagement.style.format({
+            'Views': '{:,.0f}',
+            'Likes': '{:,.0f}',
+            'Comments': '{:,.0f}',
+            'engagement_score': '{:,.0f}'
+        })
         st.dataframe(styled_pivot, use_container_width=True, hide_index=True)
 
         st.subheader("Growth in Engagement Score")
         if len(pivot_engagement) > 1:
             growth = pivot_engagement['engagement_score'].pct_change() * 100
             
-            # FIXED: Replaced NaN/None with "Baseline" for the first year
             growth_list = []
             for i, (idx, val) in enumerate(growth.items()):
                 if pd.isna(val):
@@ -644,7 +636,6 @@ def main():
             growth_df = pd.DataFrame({'Period': growth.index, 'Growth': growth_list})
             st.dataframe(growth_df, use_container_width=True, hide_index=True)
             
-            # For the chart, only plot the actual numeric values (drop the baseline)
             chart_growth = growth.dropna()
             if not chart_growth.empty:
                 st.bar_chart(chart_growth, use_container_width=True)
@@ -673,10 +664,11 @@ def main():
             for _, row in period_top.iterrows():
                 with st.expander(f"{row['Keyword']} — {row['Speaker']}"):
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Views", format_number(row['Views']))
-                    c2.metric("Likes", format_number(row['Likes']))
-                    c3.metric("Comments", format_number(row['Comments']))
-                    c4.metric("Engagement", format_number(row['engagement_score']))
+                    # Using f"{val:,.0f}" here so the Streamlit Metrics show full numbers
+                    c1.metric("Views", f"{row['Views']:,.0f}")
+                    c2.metric("Likes", f"{row['Likes']:,.0f}")
+                    c3.metric("Comments", f"{row['Comments']:,.0f}")
+                    c4.metric("Engagement", f"{row['engagement_score']:,.0f}")
 
 if __name__ == "__main__":
     main()
