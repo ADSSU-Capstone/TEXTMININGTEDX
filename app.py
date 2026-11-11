@@ -356,20 +356,36 @@ def clean_text(text):
 def process_data(df):
     df = df.copy()
 
-    # 1. DYNAMICALLY MAP COLUMN H TO "Theme"
-    if len(df.columns) >= 8 and 'Theme' not in df.columns:
+    # 1. FIX: Explicitly map 'Topic' to 'Theme' if it exists, otherwise use Column H
+    if 'Topic' in df.columns:
+        df.rename(columns={'Topic': 'Theme'}, inplace=True)
+    elif len(df.columns) >= 8 and 'Theme' not in df.columns:
         df.rename(columns={df.columns[7]: 'Theme'}, inplace=True)
+
+    # 2. FIX: Helper function to clean "3K" or "1.5M" strings into numbers
+    def clean_numeric(value):
+        if pd.isna(value) or value == "":
+            return 0
+        if isinstance(value, (int, float)):
+            return value
+        val_str = str(value).upper().strip().replace(',', '')
+        try:
+            if 'K' in val_str:
+                return float(val_str.replace('K', '')) * 1_000
+            if 'M' in val_str:
+                return float(val_str.replace('M', '')) * 1_000_000
+            return float(val_str)
+        except ValueError:
+            return 0
 
     numeric_cols = ['Views', 'Likes', 'Comments']
     for col in numeric_cols:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+            df[col] = df[col].apply(clean_numeric)
 
-    # 2. RELAXED FILTERING TO KEEP ALL ROWS
+    # 3. RELAXED FILTERING TO KEEP ALL ROWS
     df['Transcript'] = df['Transcript'].fillna("Empty Transcript")
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = df[col].fillna(0)
+    
     if 'Theme' in df.columns:
         df['Theme'] = df['Theme'].fillna("Uncategorized")
 
@@ -383,6 +399,11 @@ def process_data(df):
     labels = ['2015-2019', '2020-2025']
     df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
     df.dropna(subset=['period'], inplace=True)
+
+    # Ensure numeric columns exist before math
+    for col in numeric_cols:
+        if col not in df.columns:
+            df[col] = 0
 
     df['engagement_score'] = df['Views'] + df['Likes'] + df['Comments']
     df['clean_transcript'] = df['Transcript'].apply(clean_text)
@@ -488,7 +509,7 @@ def main():
             Total_Engagement=('engagement_score', 'sum')
         ).reset_index()
 
-        # Apply format_number to the aggregated columns
+        # Apply format_number to the aggregated columns for display
         styled_period_agg = period_agg.copy()
         for col in ['Views', 'Likes', 'Comments', 'Avg_Engagement', 'Total_Engagement']:
             styled_period_agg[col] = styled_period_agg[col].apply(format_number)
@@ -522,7 +543,7 @@ def main():
                 st.dataframe(styled_theme_agg, use_container_width=True, hide_index=True)
                 st.bar_chart(theme_agg.set_index('Theme')['engagement_score'], use_container_width=True)
             else:
-                st.info("Theme column (Column H) not found in the dataset.")
+                st.info("Theme column not found in the dataset.")
 
             # 2. MOST ENGAGING KEYWORDS IN EVERY THEME
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
@@ -555,7 +576,6 @@ def main():
             st.markdown("---")
 
     with tab3:
-        # REPLACED TAB 3 - NO MORE "TOPIC 1, 2, 3" NUMBERS
         st.header("Engagement Metrics by Theme")
         st.write("This section compares the actual Themes assigned in the dataset, showing total and average engagement.")
 
@@ -591,7 +611,7 @@ def main():
                 else:
                     st.warning("Insufficient data for the statistical test.")
         else:
-            st.info("Theme column (Column H) not found in the dataset.")
+            st.info("Theme column not found in the dataset.")
 
     with tab4:
         st.header("Trend Analysis Across Periods")
