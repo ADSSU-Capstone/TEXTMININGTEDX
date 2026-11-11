@@ -299,6 +299,15 @@ div[data-testid="stAlert"]{
 </style>
 """, unsafe_allow_html=True)
 
+# --- NUMBER FORMATTING HELPER ---
+def format_number(val):
+    if pd.isna(val): return ""
+    if val >= 1_000_000:
+        return f"{val/1_000_000:.1f}M"
+    elif val >= 1_000:
+        return f"{val/1_000:.1f}K"
+    else:
+        return f"{val:.0f}"
 
 @st.cache_data
 def load_example_data():
@@ -453,8 +462,8 @@ def main():
     peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
     k1, k2, k3, k4 = st.columns(4)
     k1.metric("Talks Analysed", f"{len(df):,}")
-    k2.metric("Total Engagement", f"{int(df['engagement_score'].sum()):,}")
-    k3.metric("Avg per Talk", f"{int(df['engagement_score'].mean()):,}")
+    k2.metric("Total Engagement", format_number(df['engagement_score'].sum()))
+    k3.metric("Avg per Talk", format_number(df['engagement_score'].mean()))
     k4.metric("Peak Period", str(peak_period))
     st.write("")
 
@@ -479,11 +488,12 @@ def main():
             Total_Engagement=('engagement_score', 'sum')
         ).reset_index()
 
-        st.dataframe(period_agg.style.format({
-            'Videos': '{:,}', 'Views': '{:,}', 'Likes': '{:,}',
-            'Comments': '{:,}', 'Avg_Engagement': '{:,.0f}',
-            'Total_Engagement': '{:,.0f}'
-        }), use_container_width=True, hide_index=True)
+        # Apply format_number to the aggregated columns
+        styled_period_agg = period_agg.copy()
+        for col in ['Views', 'Likes', 'Comments', 'Avg_Engagement', 'Total_Engagement']:
+            styled_period_agg[col] = styled_period_agg[col].apply(format_number)
+
+        st.dataframe(styled_period_agg, use_container_width=True, hide_index=True)
 
         st.subheader("Total Engagement Score by Period")
         st.bar_chart(period_agg.set_index('period')['Total_Engagement'], use_container_width=True)
@@ -506,7 +516,10 @@ def main():
                 theme_agg = p_df.groupby('Theme')['engagement_score'].sum().reset_index()
                 theme_agg = theme_agg.sort_values('engagement_score', ascending=False).head(6)
                 
-                st.dataframe(theme_agg.style.format({'engagement_score': '{:,.0f}'}), use_container_width=True, hide_index=True)
+                styled_theme_agg = theme_agg.copy()
+                styled_theme_agg['engagement_score'] = styled_theme_agg['engagement_score'].apply(format_number)
+
+                st.dataframe(styled_theme_agg, use_container_width=True, hide_index=True)
                 st.bar_chart(theme_agg.set_index('Theme')['engagement_score'], use_container_width=True)
             else:
                 st.info("Theme column (Column H) not found in the dataset.")
@@ -523,14 +536,22 @@ def main():
                         with st.expander(f"Theme: {theme} (Top 3 Titles)"):
                             display_df = theme_titles[['Keyword', 'engagement_score']].copy()
                             display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
-                            st.dataframe(display_df.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True, hide_index=True)
+                            
+                            styled_display = display_df.copy()
+                            styled_display['Engagement Score'] = styled_display['Engagement Score'].apply(format_number)
+                            
+                            st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
             # 3. MOST ENGAGING KEYWORDS OVERALL
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             top_titles = p_df.sort_values('engagement_score', ascending=False).head(5)
             display_top = top_titles[['Keyword', 'engagement_score']].copy()
             display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
-            st.dataframe(display_top.style.format({'Engagement Score': '{:,.0f}'}), use_container_width=True, hide_index=True)
+            
+            styled_top = display_top.copy()
+            styled_top['Engagement Score'] = styled_top['Engagement Score'].apply(format_number)
+
+            st.dataframe(styled_top, use_container_width=True, hide_index=True)
             st.markdown("---")
 
     with tab3:
@@ -545,11 +566,11 @@ def main():
                 Avg_Engagement=('engagement_score', 'mean')
             ).reset_index().sort_values('Total_Engagement', ascending=False)
 
-            st.dataframe(theme_agg.style.format({
-                'Videos': '{:,}', 
-                'Total_Engagement': '{:,.0f}',
-                'Avg_Engagement': '{:,.0f}'
-            }), use_container_width=True, hide_index=True)
+            styled_theme = theme_agg.copy()
+            styled_theme['Total_Engagement'] = styled_theme['Total_Engagement'].apply(format_number)
+            styled_theme['Avg_Engagement'] = styled_theme['Avg_Engagement'].apply(format_number)
+
+            st.dataframe(styled_theme, use_container_width=True, hide_index=True)
 
             st.subheader("Average Engagement Score by Theme")
             st.bar_chart(theme_agg.set_index('Theme')['Avg_Engagement'], use_container_width=True)
@@ -581,7 +602,12 @@ def main():
             aggfunc='sum', observed=True
         )
         st.subheader("Aggregate Metrics Over Time")
-        st.dataframe(pivot_engagement.style.format('{:,.0f}'), use_container_width=True, hide_index=True)
+        
+        styled_pivot = pivot_engagement.copy()
+        for col in ['Views', 'Likes', 'Comments', 'engagement_score']:
+            styled_pivot[col] = styled_pivot[col].apply(format_number)
+
+        st.dataframe(styled_pivot, use_container_width=True, hide_index=True)
 
         st.subheader("Growth in Engagement Score")
         if len(pivot_engagement) > 1:
@@ -627,10 +653,10 @@ def main():
             for _, row in period_top.iterrows():
                 with st.expander(f"{row['Keyword']} — {row['Speaker']}"):
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Views", f"{row['Views']:,}")
-                    c2.metric("Likes", f"{row['Likes']:,}")
-                    c3.metric("Comments", f"{row['Comments']:,}")
-                    c4.metric("Engagement", f"{row['engagement_score']:,}")
+                    c1.metric("Views", format_number(row['Views']))
+                    c2.metric("Likes", format_number(row['Likes']))
+                    c3.metric("Comments", format_number(row['Comments']))
+                    c4.metric("Engagement", format_number(row['engagement_score']))
 
 if __name__ == "__main__":
     main()
