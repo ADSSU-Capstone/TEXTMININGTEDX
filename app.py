@@ -167,14 +167,18 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
-/* --- FIX FOR DROPDOWN MULTISELECT MENU --- */
-div[data-baseweb="popover"] ul {
+/* --- FIX FOR DROPDOWN MULTISELECT MENU (Aggressive targeting) --- */
+div[data-baseweb="popover"],
+div[data-baseweb="popover"] > div,
+div[data-baseweb="popover"] > div > div,
+div[data-baseweb="popover"] ul,
+div[data-baseweb="popover"] li {
     background-color: var(--surface) !important;
-    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
 }
 div[data-baseweb="popover"] li {
     color: var(--text) !important;
-    background-color: transparent !important;
 }
 div[data-baseweb="popover"] li:hover {
     background-color: var(--surface-2) !important;
