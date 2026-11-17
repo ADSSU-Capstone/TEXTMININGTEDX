@@ -520,7 +520,7 @@ def main():
         st.subheader("Average Engagement Score per Video")
         st.bar_chart(period_agg.set_index('period')['Avg_Engagement'], use_container_width=True)
 
-       with tab2:
+    with tab2:
         st.header("Theme & Title Engagement Analysis")
         st.write("This section breaks down the most engaging Themes and Keywords (Titles) for each period.")
 
@@ -541,7 +541,7 @@ def main():
             else:
                 st.info("Theme column not found in the dataset.")
 
-            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME (Now grouped to prevent duplicates)
+            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME (Grouped to prevent duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
@@ -563,7 +563,7 @@ def main():
                             styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
                             st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
-            # 3. MOST ENGAGING KEYWORDS OVERALL (Now grouped to prevent duplicates)
+            # 3. MOST ENGAGING KEYWORDS OVERALL (Grouped to prevent duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             
             # Group by Keyword to sum engagement across all themes in this period
