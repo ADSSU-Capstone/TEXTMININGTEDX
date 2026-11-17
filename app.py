@@ -167,73 +167,30 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
-div[data-testid="stTabs"] div[data-baseweb="tab-list"]{
-    gap: 4px;
-    border-bottom: 2px solid var(--border);
-}
-button[data-baseweb="tab"]{
-    font-family:'Barlow Condensed', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--muted);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 10px 10px 0 0;
-    padding: 10px 20px;
+/* Styling for the new Sidebar Radio Menu (Tabs) */
+div[role="radiogroup"] > label {
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 4px;
     transition: all .18s ease;
+    cursor: pointer;
 }
-button[data-baseweb="tab"]:hover{
-    color: var(--text);
-    background: rgba(210,105,30,.10);
-    border-color: rgba(210,105,30,.28);
+div[role="radiogroup"] > label:hover {
+    background: rgba(210,105,30,.12);
 }
-button[data-baseweb="tab"][aria-selected="true"]{
-    color: #14181d;
+div[role="radiogroup"] > label[data-checked="true"] {
     background: linear-gradient(180deg, var(--ember-2), var(--ember));
-    border-color: var(--ember);
-    box-shadow: 0 -2px 20px rgba(210,105,30,.40);
+    color: #14181d;
 }
-div[data-baseweb="tab-highlight"]{ display:none; }
-div[data-baseweb="tab-border"]{ background: var(--border); }
-
-div[data-testid="stTabs"] div[role="tabpanel"]{ animation: fadeUp .35s ease both; }
-@keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-
-div[data-testid="stMetric"]{
-    position: relative;
-    background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 20px 16px;
-    overflow: hidden;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+div[role="radiogroup"] > label[data-checked="true"] p {
+    color: #14181d !important;
+    font-weight: 700;
 }
-div[data-testid="stMetric"]::before{
-    content:"";
-    position:absolute; left:0; top:0; height:3px; width:38%;
-    background: linear-gradient(90deg, var(--ember), var(--brass));
-    transition: width .32s ease;
+div[role="radiogroup"] > label[data-checked="true"] > div:first-child {
+    display: none; /* Hides the radio circle */
 }
-div[data-testid="stMetric"]:hover{
-    transform: translateY(-4px);
-    border-color: rgba(210,105,30,.55);
-    box-shadow: 0 14px 30px rgba(0,0,0,.50);
-}
-div[data-testid="stMetric"]:hover::before{ width:100%; }
-div[data-testid="stMetricLabel"] p{
-    font-family:'Barlow Condensed', sans-serif;
-    font-size: .95rem !important;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    color: var(--muted) !important;
-}
-div[data-testid="stMetricValue"]{
-    font-family:'Bebas Neue', sans-serif;
-    font-size: 2.3rem;
-    letter-spacing: 1.5px;
-    color: #fff;
+div[role="radiogroup"] > label > div:first-child {
+    display: none; /* Hides the radio circle */
 }
 
 div[data-testid="stDataFrame"]{
@@ -346,13 +303,11 @@ def clean_text(text):
 def process_data(df):
     df = df.copy()
 
-    # 1. Map 'Topic' to 'Theme' if it exists, otherwise use Column H
     if 'Topic' in df.columns:
         df.rename(columns={'Topic': 'Theme'}, inplace=True)
     elif len(df.columns) >= 8 and 'Theme' not in df.columns:
         df.rename(columns={df.columns[7]: 'Theme'}, inplace=True)
 
-    # 2. Helper function to clean "3K" or "1.5M" strings into numbers
     def clean_numeric(value):
         if pd.isna(value) or value == "":
             return 0
@@ -373,27 +328,22 @@ def process_data(df):
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric)
 
-    # 3. RELAXED FILTERING TO KEEP ALL ROWS
     df['Transcript'] = df['Transcript'].fillna("Empty Transcript")
     
     if 'Theme' in df.columns:
         df['Theme'] = df['Theme'].fillna("Uncategorized")
 
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
-    
     df.dropna(subset=['Date Released'], inplace=True)
     
-    # Keep only years 2016-2025 (2015 removed)
     df = df[(df['Date Released'].dt.year >= 2016) & (df['Date Released'].dt.year <= 2025)]
     df['year'] = df['Date Released'].dt.year
     
-    # Two 5-year periods: 2016-2020 and 2021-2025
     bins = [2015, 2020, 2025]
     labels = ['2016-2020', '2021-2025']
     df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
     df.dropna(subset=['period'], inplace=True)
 
-    # Ensure numeric columns exist before math
     for col in numeric_cols:
         if col not in df.columns:
             df[col] = 0
@@ -403,33 +353,7 @@ def process_data(df):
     return df
 
 
-def render_sidebar():
-    with st.sidebar:
-        st.markdown('<div class="side-head">DATA SOURCE</div>', unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Upload Dataset", type=['csv', 'xlsx'],
-                                         label_visibility="collapsed")
-        use_example = st.checkbox("Use example dataset (if no upload)", value=False)
-
-        data = None
-        if uploaded_file is not None:
-            try:
-                if uploaded_file.name.endswith('.csv'):
-                    data = pd.read_csv(uploaded_file)
-                else:
-                    data = pd.read_excel(uploaded_file)
-            except Exception as e:
-                st.error(f"Error loading file: {e}")
-        elif use_example:
-            data = load_example_data()
-
-        if data is None:
-            st.info("Awaiting data. Upload a file or tick the example dataset box.")
-            st.stop()
-
-        return data
-
-
-def render_filters(df):
+def render_sidebar_filters(df):
     with st.sidebar:
         st.markdown('<div class="side-head">FILTERS</div>', unsafe_allow_html=True)
 
@@ -459,7 +383,28 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    raw_df = render_sidebar()
+    # --- SIDEBAR: DATA UPLOAD ---
+    with st.sidebar:
+        st.markdown('<div class="side-head">DATA SOURCE</div>', unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("Upload Dataset", type=['csv', 'xlsx'],
+                                         label_visibility="collapsed")
+        use_example = st.checkbox("Use example dataset (if no upload)", value=False)
+
+        raw_df = None
+        if uploaded_file is not None:
+            try:
+                if uploaded_file.name.endswith('.csv'):
+                    raw_df = pd.read_csv(uploaded_file)
+                else:
+                    raw_df = pd.read_excel(uploaded_file)
+            except Exception as e:
+                st.error(f"Error loading file: {e}")
+        elif use_example:
+            raw_df = load_example_data()
+
+        if raw_df is None:
+            st.info("Awaiting data. Upload a file or tick the example dataset box.")
+            st.stop()
 
     required_cols = ['Keyword', 'Speaker', 'Date Released', 'Views', 'Likes', 'Comments', 'Transcript']
     if not all(c in raw_df.columns for c in required_cols):
@@ -471,8 +416,24 @@ def main():
         st.error("No data available after filtering.")
         st.stop()
 
-    df = render_filters(df)
+    df = render_sidebar_filters(df)
 
+    # --- SIDEBAR: NAVIGATION ---
+    with st.sidebar:
+        st.markdown('<div class="side-head">NAVIGATION</div>', unsafe_allow_html=True)
+        menu_selection = st.radio(
+            "Select View",
+            [
+                "① Engagement by Period",
+                "② Keyword & Theme Patterns",
+                "③ Theme Clusters", 
+                "④ Trends & Variations",
+                "⑤ Top Performers"
+            ],
+            label_visibility="collapsed"
+        )
+
+    # --- TOP METRICS ---
     peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
     k1, k2, k3, k4 = st.columns(4)
     
@@ -482,15 +443,8 @@ def main():
     k4.metric("Peak Period", str(peak_period))
     st.write("")
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "① Engagement by Period",
-        "② Keyword & Theme Patterns",
-        "③ Theme Clusters", 
-        "④ Trends & Variations",
-        "⑤ Top Performers"
-    ])
-
-    with tab1:
+    # --- MAIN CONTENT ROUTING ---
+    if menu_selection == "① Engagement by Period":
         st.header("Audience Engagement Analysis")
         st.write("Aggregate audience engagement metrics for each five-year period.")
 
@@ -518,7 +472,7 @@ def main():
         st.subheader("Average Engagement Score per Video")
         st.bar_chart(period_agg.set_index('period')['Avg_Engagement'], use_container_width=True)
 
-    with tab2:
+    elif menu_selection == "② Keyword & Theme Patterns":
         st.header("Theme & Title Engagement Analysis")
         st.write("This section breaks down the most engaging Themes and Keywords (Titles) for each period.")
 
@@ -544,7 +498,6 @@ def main():
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
                     
-                    # Group by Keyword to sum engagement for duplicate titles within this theme
                     theme_titles = (
                         p_df[p_df['Theme'] == theme]
                         .groupby('Keyword', as_index=False)['engagement_score']
@@ -561,10 +514,10 @@ def main():
                             styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
                             st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
-            # 3. MOST ENGAGING KEYWORDS OVERALL (Grouped to prevent duplicates)
+            # 3. MOST ENGAGING KEYWORDS OVERALL (Fix applied: No duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             
-            # Group by Keyword to sum engagement across all themes in this period
+            # Group by Keyword first, THEN sort, THEN take top 5
             top_titles = (
                 p_df.groupby('Keyword', as_index=False)['engagement_score']
                 .sum()
@@ -579,7 +532,7 @@ def main():
             st.dataframe(styled_top, use_container_width=True, hide_index=True)
             st.markdown("---")
 
-    with tab3:
+    elif menu_selection == "③ Theme Clusters":
         st.header("Engagement Metrics by Theme")
         st.write("This section compares the actual Themes assigned in the dataset, showing total and average engagement.")
 
@@ -617,7 +570,7 @@ def main():
         else:
             st.info("Theme column not found in the dataset.")
 
-    with tab4:
+    elif menu_selection == "④ Trends & Variations":
         st.header("Trend Analysis Across Periods")
         st.write("Period-over-period movement in aggregate engagement and topic mix.")
 
@@ -664,11 +617,10 @@ def main():
         else:
             st.info("Theme column not found.")
 
-    with tab5:
+    elif menu_selection == "⑤ Top Performers":
         st.header("Top Performing Content")
         st.write("The three highest-engagement talks inside each period.")
 
-        # Group by Keyword to get the highest-engagement talks without duplicates
         top_videos = (
             df.groupby(['period', 'Keyword', 'Speaker'], as_index=False)
             .agg({
