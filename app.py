@@ -520,7 +520,7 @@ def main():
         st.subheader("Average Engagement Score per Video")
         st.bar_chart(period_agg.set_index('period')['Avg_Engagement'], use_container_width=True)
 
-    with tab2:
+       with tab2:
         st.header("Theme & Title Engagement Analysis")
         st.write("This section breaks down the most engaging Themes and Keywords (Titles) for each period.")
 
@@ -541,24 +541,40 @@ def main():
             else:
                 st.info("Theme column not found in the dataset.")
 
-            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME
+            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME (Now grouped to prevent duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
-                    theme_titles = p_df[p_df['Theme'] == theme].sort_values('engagement_score', ascending=False).head(3)
+                    
+                    # Group by Keyword to sum engagement for duplicate titles within this theme
+                    theme_titles = (
+                        p_df[p_df['Theme'] == theme]
+                        .groupby('Keyword', as_index=False)['engagement_score']
+                        .sum()
+                        .sort_values('engagement_score', ascending=False)
+                        .head(3)
+                    )
                     
                     if not theme_titles.empty:
                         with st.expander(f"Theme: {theme} (Top 3 Titles)"):
-                            display_df = theme_titles[['Keyword', 'engagement_score']].copy()
+                            display_df = theme_titles.copy()
                             display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
                             
                             styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
                             st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
-            # 3. MOST ENGAGING KEYWORDS OVERALL
+            # 3. MOST ENGAGING KEYWORDS OVERALL (Now grouped to prevent duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
-            top_titles = p_df.sort_values('engagement_score', ascending=False).head(5)
-            display_top = top_titles[['Keyword', 'engagement_score']].copy()
+            
+            # Group by Keyword to sum engagement across all themes in this period
+            top_titles = (
+                p_df.groupby('Keyword', as_index=False)['engagement_score']
+                .sum()
+                .sort_values('engagement_score', ascending=False)
+                .head(5)
+            )
+            
+            display_top = top_titles.copy()
             display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
             
             styled_top = display_top.style.format({'Engagement Score': '{:,.0f}'})
