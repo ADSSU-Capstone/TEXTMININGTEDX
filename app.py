@@ -167,6 +167,25 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
+/* --- FIX FOR DROPDOWN MULTISELECT MENU --- */
+div[data-baseweb="popover"] ul {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+}
+div[data-baseweb="popover"] li {
+    color: var(--text) !important;
+    background-color: transparent !important;
+}
+div[data-baseweb="popover"] li:hover {
+    background-color: var(--surface-2) !important;
+    color: var(--ember-2) !important;
+}
+div[data-baseweb="popover"] li[aria-selected="true"] {
+    background-color: rgba(210,105,30,.20) !important;
+    color: var(--ember-2) !important;
+}
+
+/* --- Scoped Sidebar Navigation --- */
 section[data-testid="stSidebar"] div[role="radiogroup"] > label {
     padding: 10px 14px;
     border-radius: 10px;
@@ -192,6 +211,7 @@ section[data-testid="stSidebar"] div[role="radiogroup"] > label > div:first-chil
     display: none;
 }
 
+/* --- KPI CARDS --- */
 div[data-testid="stMetric"]{
     position: relative;
     background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
@@ -511,7 +531,6 @@ def main():
             
             p_df = df[df['period'] == period].copy()
 
-            # --- THE FIX: Create a lowercase, stripped version for grouping ---
             p_df['Keyword_Clean'] = p_df['Keyword'].astype(str).str.lower().str.strip()
 
             st.markdown("#### Top 6 Most Engaging Topics (Themes)")
@@ -533,7 +552,7 @@ def main():
                         p_df[p_df['Theme'] == theme]
                         .groupby('Keyword_Clean', as_index=False)
                         .agg({
-                            'Keyword': 'first',  # Keeps the original capitalization of the first match
+                            'Keyword': 'first',
                             'engagement_score': 'sum'
                         })
                         .sort_values('engagement_score', ascending=False)
@@ -550,7 +569,6 @@ def main():
 
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             
-            # Group by the clean version to combine case/space variations
             top_titles = (
                 p_df.groupby('Keyword_Clean', as_index=False)
                 .agg({
