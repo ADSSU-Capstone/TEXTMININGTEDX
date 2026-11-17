@@ -299,14 +299,12 @@ div[data-testid="stAlert"]{
 </style>
 """, unsafe_allow_html=True)
 
-# --- REMOVED format_number helper so we can use raw full numbers ---
-
 @st.cache_data
 def load_example_data():
     df = pd.DataFrame({
         'Speaker': ['Jessica Dere', 'Nadine Burke Harris', 'Guy Winch', 'John Rigg', 'Dr. Jeffrey Lieberman', 'Judson Brewer'],
         'Keyword': ['Challenges and rewards of a culturally informed approach to mental health', 'How childhood trauma affects health across a lifetime', 'How to practice emotional first aid', 'The effect of trauma on the brain and how it affects behaviors', 'Imagine there was no stigma to mental illness', 'A simple way to break a bad habit'],
-        'Date Released': pd.to_datetime(['2015-04-21', '2015-02-18', '2015-02-17', '2015-03-21', '2016-01-12', '2016-02-25']),
+        'Date Released': pd.to_datetime(['2016-04-21', '2016-02-18', '2016-02-17', '2017-03-21', '2022-01-12', '2023-02-25']),
         'Views': [465557, 8300874, 5467141, 2760468, 609769, 16882137],
         'Likes': [3000, 197000, 201000, 33000, 9000, 328000],
         'Comments': [45, 9237, 3391, 2319, 643, 5667],
@@ -384,11 +382,16 @@ def process_data(df):
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
     df.dropna(subset=['Date Released'], inplace=True)
     
-    df = df[(df['Date Released'].dt.year >= 2015) & (df['Date Released'].dt.year <= 2025)]
+    # Keep only years 2016-2025 (2015 removed)
+    df = df[(df['Date Released'].dt.year >= 2016) & (df['Date Released'].dt.year <= 2025)]
     df['year'] = df['Date Released'].dt.year
     
-    bins = [2014, 2019, 2025]
-    labels = ['2015-2019', '2020-2025']
+    # Two 5-year periods: 2016-2020 and 2021-2025
+    # With right=True, edges [2015, 2020, 2025] capture:
+    #   (2015, 2020] -> 2016, 2017, 2018, 2019, 2020
+    #   (2020, 2025] -> 2021, 2022, 2023, 2024, 2025
+    bins = [2015, 2020, 2025]
+    labels = ['2016-2020', '2021-2025']
     df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
     df.dropna(subset=['period'], inplace=True)
 
@@ -453,7 +456,7 @@ def main():
     <div class="hero">
         <div class="hero-tag">TEDX DATA INTELLIGENCE</div>
         <div class="hero-title">TEDx Talk Engagement Analysis</div>
-        <p class="hero-sub">Audience engagement, language patterns and topic clusters · 2015 – 2025</p>
+        <p class="hero-sub">Audience engagement, language patterns and topic clusters · 2016 – 2025</p>
         <div class="hero-bar"></div>
     </div>
     """, unsafe_allow_html=True)
@@ -475,7 +478,6 @@ def main():
     peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
     k1, k2, k3, k4 = st.columns(4)
     
-    # Changed to use f"{val:,.0f}" to format with commas and no decimals
     k1.metric("Talks Analysed", f"{len(df):,.0f}")
     k2.metric("Total Engagement", f"{df['engagement_score'].sum():,.0f}")
     k3.metric("Avg per Talk", f"{df['engagement_score'].mean():,.0f}")
@@ -503,7 +505,6 @@ def main():
             Total_Engagement=('engagement_score', 'sum')
         ).reset_index()
 
-        # Using Pandas Styler to format numbers with commas directly in the dataframe
         styled_df = period_agg.style.format({
             'Views': '{:,.0f}',
             'Likes': '{:,.0f}',
@@ -544,10 +545,8 @@ def main():
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
-                    # Get top 3 titles for this theme
                     theme_titles = p_df[p_df['Theme'] == theme].sort_values('engagement_score', ascending=False).head(3)
                     
-                    # Only display if there are titles
                     if not theme_titles.empty:
                         with st.expander(f"Theme: {theme} (Top 3 Titles)"):
                             display_df = theme_titles[['Keyword', 'engagement_score']].copy()
@@ -664,7 +663,6 @@ def main():
             for _, row in period_top.iterrows():
                 with st.expander(f"{row['Keyword']} — {row['Speaker']}"):
                     c1, c2, c3, c4 = st.columns(4)
-                    # Using f"{val:,.0f}" here so the Streamlit Metrics show full numbers
                     c1.metric("Views", f"{row['Views']:,.0f}")
                     c2.metric("Likes", f"{row['Likes']:,.0f}")
                     c3.metric("Comments", f"{row['Comments']:,.0f}")
