@@ -167,30 +167,66 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
-/* Styling for the new Sidebar Radio Menu (Tabs) */
-div[role="radiogroup"] > label {
+/* --- Scoped Sidebar Navigation --- */
+section[data-testid="stSidebar"] div[role="radiogroup"] > label {
     padding: 10px 14px;
     border-radius: 10px;
     margin-bottom: 4px;
     transition: all .18s ease;
     cursor: pointer;
 }
-div[role="radiogroup"] > label:hover {
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
     background: rgba(210,105,30,.12);
 }
-div[role="radiogroup"] > label[data-checked="true"] {
+section[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] {
     background: linear-gradient(180deg, var(--ember-2), var(--ember));
     color: #14181d;
 }
-div[role="radiogroup"] > label[data-checked="true"] p {
+section[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] p {
     color: #14181d !important;
     font-weight: 700;
 }
-div[role="radiogroup"] > label[data-checked="true"] > div:first-child {
-    display: none; /* Hides the radio circle */
+section[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] > div:first-child {
+    display: none;
 }
-div[role="radiogroup"] > label > div:first-child {
-    display: none; /* Hides the radio circle */
+section[data-testid="stSidebar"] div[role="radiogroup"] > label > div:first-child {
+    display: none;
+}
+
+/* --- KPI CARDS --- */
+div[data-testid="stMetric"]{
+    position: relative;
+    background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px 16px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+div[data-testid="stMetric"]::before{
+    content:"";
+    position:absolute; left:0; top:0; height:3px; width:38%;
+    background: linear-gradient(90deg, var(--ember), var(--brass));
+    transition: width .32s ease;
+}
+div[data-testid="stMetric"]:hover{
+    transform: translateY(-4px);
+    border-color: rgba(210,105,30,.55);
+    box-shadow: 0 14px 30px rgba(0,0,0,.50);
+}
+div[data-testid="stMetric"]:hover::before{ width:100%; }
+div[data-testid="stMetricLabel"] p{
+    font-family:'Barlow Condensed', sans-serif;
+    font-size: .95rem !important;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--muted) !important;
+}
+div[data-testid="stMetricValue"]{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 2.3rem;
+    letter-spacing: 1.5px;
+    color: #fff;
 }
 
 div[data-testid="stDataFrame"]{
@@ -332,6 +368,9 @@ def process_data(df):
     
     if 'Theme' in df.columns:
         df['Theme'] = df['Theme'].fillna("Uncategorized")
+        
+    # --- THE FIX: Clean whitespace from titles to prevent false duplicates ---
+    df['Keyword'] = df['Keyword'].astype(str).str.strip()
 
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
     df.dropna(subset=['Date Released'], inplace=True)
@@ -383,7 +422,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # --- SIDEBAR: DATA UPLOAD ---
     with st.sidebar:
         st.markdown('<div class="side-head">DATA SOURCE</div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader("Upload Dataset", type=['csv', 'xlsx'],
@@ -418,7 +456,6 @@ def main():
 
     df = render_sidebar_filters(df)
 
-    # --- SIDEBAR: NAVIGATION ---
     with st.sidebar:
         st.markdown('<div class="side-head">NAVIGATION</div>', unsafe_allow_html=True)
         menu_selection = st.radio(
@@ -433,7 +470,6 @@ def main():
             label_visibility="collapsed"
         )
 
-    # --- TOP METRICS ---
     peak_period = df.groupby('period', observed=True)['engagement_score'].sum().idxmax()
     k1, k2, k3, k4 = st.columns(4)
     
@@ -443,7 +479,6 @@ def main():
     k4.metric("Peak Period", str(peak_period))
     st.write("")
 
-    # --- MAIN CONTENT ROUTING ---
     if menu_selection == "① Engagement by Period":
         st.header("Audience Engagement Analysis")
         st.write("Aggregate audience engagement metrics for each five-year period.")
@@ -481,7 +516,6 @@ def main():
             
             p_df = df[df['period'] == period]
 
-            # 1. TOP 6 MOST ENGAGING TOPICS (THEMES)
             st.markdown("#### Top 6 Most Engaging Topics (Themes)")
             if 'Theme' in p_df.columns:
                 theme_agg = p_df.groupby('Theme')['engagement_score'].sum().reset_index()
@@ -493,7 +527,6 @@ def main():
             else:
                 st.info("Theme column not found in the dataset.")
 
-            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
@@ -514,10 +547,9 @@ def main():
                             styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
                             st.dataframe(styled_display, use_container_width=True, hide_index=True)
 
-            # 3. MOST ENGAGING KEYWORDS OVERALL (Fix applied: No duplicates)
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             
-            # Group by Keyword first, THEN sort, THEN take top 5
+            # The clean text fix in process_data solves this groupby issue
             top_titles = (
                 p_df.groupby('Keyword', as_index=False)['engagement_score']
                 .sum()
