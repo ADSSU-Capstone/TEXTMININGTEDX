@@ -167,24 +167,29 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
-/* --- FIX FOR DROPDOWN MULTISELECT MENU (Aggressive targeting) --- */
+/* --- AGGRESSIVE FIX FOR DROPDOWN MULTISELECT MENU --- */
+/* Targets the generic popover container and everything inside it */
 div[data-baseweb="popover"],
-div[data-baseweb="popover"] > div,
-div[data-baseweb="popover"] > div > div,
+div[data-baseweb="popover"] div,
 div[data-baseweb="popover"] ul,
 div[data-baseweb="popover"] li {
     background-color: var(--surface) !important;
     color: var(--text) !important;
     border-color: var(--border) !important;
 }
-div[data-baseweb="popover"] li {
+/* Specific text styling for dropdown items */
+div[data-baseweb="popover"] li div {
     color: var(--text) !important;
 }
-div[data-baseweb="popover"] li:hover {
+/* Hover effect for dropdown items */
+div[data-baseweb="popover"] li:hover,
+div[data-baseweb="popover"] li:hover div {
     background-color: var(--surface-2) !important;
     color: var(--ember-2) !important;
 }
-div[data-baseweb="popover"] li[aria-selected="true"] {
+/* Selected item styling */
+div[data-baseweb="popover"] li[aria-selected="true"],
+div[data-baseweb="popover"] li[aria-selected="true"] div {
     background-color: rgba(210,105,30,.20) !important;
     color: var(--ember-2) !important;
 }
