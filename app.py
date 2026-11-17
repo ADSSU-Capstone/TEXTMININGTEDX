@@ -167,7 +167,6 @@ span[data-baseweb="tag"]{
     font-weight: 600;
 }
 
-/* --- Scoped Sidebar Navigation --- */
 section[data-testid="stSidebar"] div[role="radiogroup"] > label {
     padding: 10px 14px;
     border-radius: 10px;
@@ -193,7 +192,6 @@ section[data-testid="stSidebar"] div[role="radiogroup"] > label > div:first-chil
     display: none;
 }
 
-/* --- KPI CARDS --- */
 div[data-testid="stMetric"]{
     position: relative;
     background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
@@ -368,9 +366,6 @@ def process_data(df):
     
     if 'Theme' in df.columns:
         df['Theme'] = df['Theme'].fillna("Uncategorized")
-        
-    # --- THE FIX: Clean whitespace from titles to prevent false duplicates ---
-    df['Keyword'] = df['Keyword'].astype(str).str.strip()
 
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
     df.dropna(subset=['Date Released'], inplace=True)
@@ -514,7 +509,10 @@ def main():
         for period in df['period'].unique():
             st.markdown(f"### Period: {period}")
             
-            p_df = df[df['period'] == period]
+            p_df = df[df['period'] == period].copy()
+
+            # --- THE FIX: Create a lowercase, stripped version for grouping ---
+            p_df['Keyword_Clean'] = p_df['Keyword'].astype(str).str.lower().str.strip()
 
             st.markdown("#### Top 6 Most Engaging Topics (Themes)")
             if 'Theme' in p_df.columns:
@@ -533,15 +531,18 @@ def main():
                     
                     theme_titles = (
                         p_df[p_df['Theme'] == theme]
-                        .groupby('Keyword', as_index=False)['engagement_score']
-                        .sum()
+                        .groupby('Keyword_Clean', as_index=False)
+                        .agg({
+                            'Keyword': 'first',  # Keeps the original capitalization of the first match
+                            'engagement_score': 'sum'
+                        })
                         .sort_values('engagement_score', ascending=False)
                         .head(3)
                     )
                     
                     if not theme_titles.empty:
                         with st.expander(f"Theme: {theme} (Top 3 Titles)"):
-                            display_df = theme_titles.copy()
+                            display_df = theme_titles[['Keyword', 'engagement_score']].copy()
                             display_df.columns = ['Talk Title (Keyword)', 'Engagement Score']
                             
                             styled_display = display_df.style.format({'Engagement Score': '{:,.0f}'})
@@ -549,15 +550,18 @@ def main():
 
             st.markdown("#### Most Engaging Keywords (Titles) Overall")
             
-            # The clean text fix in process_data solves this groupby issue
+            # Group by the clean version to combine case/space variations
             top_titles = (
-                p_df.groupby('Keyword', as_index=False)['engagement_score']
-                .sum()
+                p_df.groupby('Keyword_Clean', as_index=False)
+                .agg({
+                    'Keyword': 'first',
+                    'engagement_score': 'sum'
+                })
                 .sort_values('engagement_score', ascending=False)
                 .head(5)
             )
             
-            display_top = top_titles.copy()
+            display_top = top_titles[['Keyword', 'engagement_score']].copy()
             display_top.columns = ['Talk Title (Keyword)', 'Engagement Score']
             
             styled_top = display_top.style.format({'Engagement Score': '{:,.0f}'})
@@ -653,9 +657,13 @@ def main():
         st.header("Top Performing Content")
         st.write("The three highest-engagement talks inside each period.")
 
+        df_top = df.copy()
+        df_top['Keyword_Clean'] = df_top['Keyword'].astype(str).str.lower().str.strip()
+
         top_videos = (
-            df.groupby(['period', 'Keyword', 'Speaker'], as_index=False)
+            df_top.groupby(['period', 'Keyword_Clean', 'Speaker'], as_index=False)
             .agg({
+                'Keyword': 'first',
                 'Views': 'sum',
                 'Likes': 'sum',
                 'Comments': 'sum',
