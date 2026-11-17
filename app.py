@@ -380,6 +380,7 @@ def process_data(df):
         df['Theme'] = df['Theme'].fillna("Uncategorized")
 
     df['Date Released'] = pd.to_datetime(df['Date Released'], errors='coerce')
+    
     df.dropna(subset=['Date Released'], inplace=True)
     
     # Keep only years 2016-2025 (2015 removed)
@@ -387,9 +388,6 @@ def process_data(df):
     df['year'] = df['Date Released'].dt.year
     
     # Two 5-year periods: 2016-2020 and 2021-2025
-    # With right=True, edges [2015, 2020, 2025] capture:
-    #   (2015, 2020] -> 2016, 2017, 2018, 2019, 2020
-    #   (2020, 2025] -> 2021, 2022, 2023, 2024, 2025
     bins = [2015, 2020, 2025]
     labels = ['2016-2020', '2021-2025']
     df['period'] = pd.cut(df['year'], bins=bins, labels=labels, right=True, include_lowest=True)
@@ -541,7 +539,7 @@ def main():
             else:
                 st.info("Theme column not found in the dataset.")
 
-            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME (Grouped to prevent duplicates)
+            # 2. MOST ENGAGING KEYWORDS IN EVERY THEME
             st.markdown("#### Most Engaging Keywords (Titles) in Every Theme")
             if 'Theme' in p_df.columns:
                 for theme in p_df['Theme'].unique():
@@ -670,8 +668,19 @@ def main():
         st.header("Top Performing Content")
         st.write("The three highest-engagement talks inside each period.")
 
-        top_videos = (df.sort_values('engagement_score', ascending=False)
-                        .groupby('period', observed=True).head(3))
+        # Group by Keyword to get the highest-engagement talks without duplicates
+        top_videos = (
+            df.groupby(['period', 'Keyword', 'Speaker'], as_index=False)
+            .agg({
+                'Views': 'sum',
+                'Likes': 'sum',
+                'Comments': 'sum',
+                'engagement_score': 'sum'
+            })
+            .sort_values('engagement_score', ascending=False)
+            .groupby('period', observed=True)
+            .head(3)
+        )
 
         for period in df['period'].unique():
             st.subheader(f"Period: {period}")
